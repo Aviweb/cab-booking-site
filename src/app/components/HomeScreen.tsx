@@ -3,7 +3,7 @@ import React from "react";
 import { FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 
 const HomeScreen = () => {
-  const scrollTo = (section: any) => {
+  const scrollTo = (section: string) => {
     document.querySelector(`#${section}`)?.scrollIntoView({
       behavior: "smooth",
     });
@@ -60,7 +60,7 @@ const HomeScreen = () => {
         <picture>
           <source srcSet="/img/home.webp" type="image/webp" />
           <source srcSet="/img/home.png" type="image/png" />
-          <img src="/img/home.png" className="w-72 lg:w-5/6" />
+          <img alt="image" src="/img/home.png" className="w-72 lg:w-5/6" />
         </picture>
       </div>
     </section>

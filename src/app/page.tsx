@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Navbar from "./components/Navbar";
 import BookingScreen from "./components/BookingScreen";
 import HomeScreen from "./components/HomeScreen";

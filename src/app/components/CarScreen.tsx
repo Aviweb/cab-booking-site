@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaRupeeSign } from 'react-icons/fa';
+import React from "react";
+import { FaRupeeSign } from "react-icons/fa";
 
 const CarScreen = () => {
   return (
@@ -17,7 +17,7 @@ const CarScreen = () => {
           <picture>
             <source srcSet="/img/cars/swift.webp" type="image/webp" />
             <source srcSet="/img/cars/swift.png" type="image/png" />
-            <img src="/img/cars/swift.png" width="120px" />
+            <img alt="image" src="/img/cars/swift.png" width="120px" />
           </picture>
           <span className="py-2 px-4 bg-charade-50 rounded-full text-charade-500 font-bold">
             <FaRupeeSign className="inline -mt-1" />
@@ -30,7 +30,7 @@ const CarScreen = () => {
           <picture>
             <source srcSet="/img/cars/innova.webp" type="image/webp" />
             <source srcSet="/img/cars/innova.png" type="image/png" />
-            <img src="/img/cars/innova.png" width="120px" />
+            <img alt="image" src="/img/cars/innova.png" width="120px" />
           </picture>
           <span className="py-2 px-4 bg-charade-50 rounded-full text-charade-500 font-bold">
             <FaRupeeSign className="inline -mt-1" />
@@ -43,7 +43,7 @@ const CarScreen = () => {
           <picture>
             <source srcSet="/img/cars/traveller.webp" type="image/webp" />
             <source srcSet="/img/cars/traveller.png" type="image/png" />
-            <img src="/img/cars/traveller.png" width="120px" />
+            <img alt="image" src="/img/cars/traveller.png" width="120px" />
           </picture>
           <span className="py-2 px-4 bg-charade-50 rounded-full text-charade-500 font-bold">
             <FaRupeeSign className="inline -mt-1" />

@@ -43,13 +43,13 @@ const BookingScreen = () => {
         }
         return response.json();
       })
-      .then(function (data) {
+      .then(function () {
         setLoading(false);
         setIsBooking(true);
       })
       .catch((error) => {
         setLoading(false);
-        console.log("Invalid Data");
+        console.log("Invalid Data", error);
       });
   };
 
@@ -183,7 +183,7 @@ const BookingScreen = () => {
             </div>
           </div>
           <button
-            onClick={handleSubmit((data: any) => onSubmit(data))}
+            onClick={handleSubmit((data) => onSubmit(data))}
             className="bg-charade-500 text-white text-xl py-4 px-10 mt-5 mb-16 rounded-full font-bold disabled:opacity-50 transform transition-all hover:scale-110"
             disabled={loading}
           >

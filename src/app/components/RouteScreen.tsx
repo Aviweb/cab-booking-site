@@ -4,15 +4,15 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PriceCard from "./PriceCard";
-interface props {
-  startLoc?: any;
-  endLoc?: any;
-  sedan?: any;
-  suv?: any;
-  traveller?: any;
+export interface RoutesProps {
+  startLoc?: string;
+  endLoc?: string;
+  sedan?: number;
+  suv?: number;
+  traveller?: number;
 }
 const RouteScreen = () => {
-  const routes: props[] = [
+  const routes: RoutesProps[] = [
     {
       startLoc: "Chandigarh",
       endLoc: "Delhi",
@@ -110,7 +110,7 @@ const RouteScreen = () => {
       </span>
       <div className="w-full px-8">
         <Slider {...settings}>
-          {routes.map((route: any, index) => (
+          {routes.map((route: RoutesProps, index) => (
             <PriceCard key={index} route={route} />
           ))}
         </Slider>

@@ -1,15 +1,8 @@
 import React from "react";
 import { FaArrowDown, FaArrowUp, FaCarSide, FaRupeeSign } from "react-icons/fa";
+import { RoutesProps } from "./RouteScreen";
 
-interface Route {
-  startLoc: string;
-  endLoc: string;
-  sedan: number;
-  suv: number;
-  traveller: number;
-}
-
-const PriceCard = ({ route }: { route: Route }) => {
+const PriceCard = ({ route }: { route: RoutesProps }) => {
   const { startLoc, endLoc, sedan, suv, traveller } = route;
   return (
     <div className="w-full px-5 transform transition-all hover:scale-110 py-10">
@@ -32,17 +25,17 @@ const PriceCard = ({ route }: { route: Route }) => {
         <div className="w-full px-3 font-bold text-charade-500">
           <div className="flex justify-between my-3">
             <span>Sedan</span>
-            <span>{sedan.toLocaleString("en")}</span>
+            <span>{sedan?.toLocaleString("en")}</span>
           </div>
 
           <div className="flex justify-between my-3">
             <span>SUV</span>
-            <span>{suv.toLocaleString("en")}</span>
+            <span>{suv?.toLocaleString("en")}</span>
           </div>
 
           <div className="flex justify-between my-3">
             <span>Traveller</span>
-            <span>{traveller.toLocaleString("en")}</span>
+            <span>{traveller?.toLocaleString("en")}</span>
           </div>
         </div>
       </div>

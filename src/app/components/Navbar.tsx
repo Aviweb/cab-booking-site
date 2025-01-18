@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import MenuButton from "./MenuButton";
 
 interface NavbarDataProps {
@@ -8,7 +8,8 @@ interface NavbarDataProps {
 }
 
 const Navbar = () => {
-  const [isOpen, SetIsOpen] = useState(true);
+  // const [isOpen, SetIsOpen] = useState(true);
+  const isOpen = true;
   const NavbarButtons: NavbarDataProps[] = [
     { title: "Home", section: "home" },
     { title: "Book Cab", section: "booking" },
@@ -19,7 +20,7 @@ const Navbar = () => {
     // SetIsOpen(!isOpen);
   };
 
-  const scrollTo = (section: any) => {
+  const scrollTo = (section: string) => {
     document.querySelector(`#${section}`)?.scrollIntoView({
       behavior: "smooth",
     });

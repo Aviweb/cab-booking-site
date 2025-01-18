@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 const FeatureScreen = () => {
   return (
     <>
@@ -15,6 +14,7 @@ const FeatureScreen = () => {
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
               <img
+                alt="image"
                 src="/img/features/pin.svg"
                 width="100px"
                 className="m-auto"
@@ -33,6 +33,7 @@ const FeatureScreen = () => {
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
               <img
+                alt="image"
                 src="/img/features/airplane.svg"
                 width="100px"
                 className="m-auto"
@@ -52,6 +53,7 @@ const FeatureScreen = () => {
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
               <img
+                alt="image"
                 src="/img/features/india.svg"
                 width="100px"
                 className="m-auto"
