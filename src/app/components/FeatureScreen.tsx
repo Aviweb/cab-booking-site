@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 const FeatureScreen = () => {
   return (
     <>
@@ -13,10 +14,12 @@ const FeatureScreen = () => {
         <div className="flex flex-col justify-between items-start md:flex-row w-full">
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
-              <img
+              <Image
                 alt="image"
                 src="/img/features/pin.svg"
-                width="100px"
+                width={100}
+                height={10}
+                // width="100px"
                 className="m-auto"
               />
             </div>
@@ -32,10 +35,11 @@ const FeatureScreen = () => {
 
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
-              <img
+              <Image
                 alt="image"
                 src="/img/features/airplane.svg"
-                width="100px"
+                width={100}
+                height={10}
                 className="m-auto"
               />
             </div>
@@ -52,10 +56,12 @@ const FeatureScreen = () => {
 
           <div className="w-full my-12 md:my-16">
             <div className="transform transition-all hover:scale-110">
-              <img
+              <Image
                 alt="image"
                 src="/img/features/india.svg"
-                width="100px"
+                // width="100px"
+                width={100}
+                height={10}
                 className="m-auto"
               />
             </div>
