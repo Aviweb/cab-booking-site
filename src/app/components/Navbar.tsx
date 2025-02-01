@@ -26,12 +26,12 @@ const Navbar = () => {
     });
   };
   return (
-    <div className="w-full p-6 flex justify-between items-center fixed bg-white z-50">
+    <div className="px-[100px] w-full flex justify-between items-center  bg-transparent z-50">
       <div className="w-56 mr-5">
         <picture>
           <source srcSet="/img/logo.webp" type="image/webp" />
           <source srcSet="/img/logo.png" type="image/png" />
-          <img src="/img/logo.png" className="object-contain" />
+          <img src="/img/logo.png" className="object-contain" alt="image" />
         </picture>
       </div>
       <MenuButton isOpen={isOpen} toggleMenu={toggleMenuHandler} />
@@ -40,7 +40,7 @@ const Navbar = () => {
           isOpen
             ? `scale-y-100 flex flex-col bg-charade-400 text-white rounded-2xl p-4 top-20`
             : `scale-y-0 top-20 md:top-0`
-        } md:scale-100 md:block md:relative md:top-0 md:bg-white md:text-charade-500`}
+        } md:scale-100 md:block md:relative md:top-0 md:bg-transparent md:text-charade-500`}
         style={{ width: `${isOpen ? `calc(100% - 48px)` : `auto`}` }}
       >
         {NavbarButtons.map((navItem: NavbarDataProps, index) => (

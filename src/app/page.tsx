@@ -1,4 +1,3 @@
-import Navbar from "./components/Navbar";
 import BookingScreen from "./components/BookingScreen";
 import HomeScreen from "./components/HomeScreen";
 import RouteScreen from "./components/RouteScreen";
@@ -9,8 +8,9 @@ import FooterScreen from "./components/FooterScreen";
 export default function Home() {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <HomeScreen />
+
       <BookingScreen />
       <RouteScreen />
       <FeatureScreen />
