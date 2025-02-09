@@ -16,12 +16,12 @@ const Navbar = () => {
     { title: "Contact Us", section: "contact" },
   ];
 
-  const NavbarButtonsDriver: NavbarDataProps[] = [
-    { title: "Home", section: "home" },
-    { title: "Booking Requests", section: "booking" },
-    { title: "Routes", section: "routes" },
-    { title: "Contact Us", section: "contact" },
-  ];
+  // const NavbarButtonsDriver: NavbarDataProps[] = [
+  //   { title: "Home", section: "home" },
+  //   { title: "Booking Requests", section: "booking" },
+  //   { title: "Routes", section: "routes" },
+  //   { title: "Contact Us", section: "contact" },
+  // ];
 
   const scrollTo = (section: string) => {
     document.querySelector(`#${section}`)?.scrollIntoView({
