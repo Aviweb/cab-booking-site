@@ -1,7 +1,8 @@
-import LoginForm from "@/app/components/LoginPage";
-import React from "react";
+"use client";
+import LoginPage from "../components/LoginPage";
 
 const Page = () => {
-  return <LoginForm />;
+  return <LoginPage />;
 };
+
 export default Page;
