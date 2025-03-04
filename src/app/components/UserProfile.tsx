@@ -14,10 +14,12 @@ import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/shadcn/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
 
 export function UserProfile() {
   const [userLoggedin, setUserLoggedIn] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");
@@ -41,6 +43,18 @@ export function UserProfile() {
     // };
     // fetchData();
   }, []);
+
+  const clearCookies = () => {
+    // Get all cookies
+    const cookies = document.cookie.split(";");
+
+    // Loop through and remove each cookie
+    cookies.forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    });
+  };
   return (
     <NavigationMenu className="translate-x-10">
       <NavigationMenuList>
@@ -55,13 +69,20 @@ export function UserProfile() {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             {userLoggedin ? (
-              <Button>Logout</Button>
+              <Button
+                onClick={() => {
+                  clearCookies();
+                  window.location.href = "/";
+                }}
+              >
+                Logout
+              </Button>
             ) : (
               <ul className="flex p-4 lg:w-[300px] space-x-3  lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3 rounded-lg w-[180px] bg-[#FCD172] ">
                   <Link
                     className="flex h-full w-full select-none flex-col items-center justify-between rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/"
+                    href="/plogin"
                   >
                     <User className="h-6 w-6" />
                     <p className="mb-2 mt-4 text-lg font-medium">Passenger</p>

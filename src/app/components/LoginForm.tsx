@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 interface props {
   setFormState: React.Dispatch<SetStateAction<string>>;
+  role?: string;
 }
 
-export const LoginForm = ({ setFormState }: props) => {
+export const LoginForm = ({ setFormState, role }: props) => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
@@ -17,34 +18,67 @@ export const LoginForm = ({ setFormState }: props) => {
       setErrorMessage("*Fill all the fields");
       return;
     }
-    try {
-      const formData = {
-        email: email,
-        password: pass,
-        // role: "student",
-      };
-      const response = await fetch("/api/dlogin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
 
-      const data = await response.json();
+    if (role === "driver") {
+      try {
+        const formData = {
+          email: email,
+          password: pass,
+          // role: "student",
+        };
+        const response = await fetch("/api/dlogin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
 
-      console.log("res", data);
+        const data = await response.json();
 
-      if (data.error) {
-        // alert(data.error);
-        setErrorMessage(data?.error);
-        console.log("da", data);
-      } else {
-        setErrorMessage("");
-        document.cookie = `token=${data.token}; path=/; Secure`;
-        document.cookie = `uuid=${data.userId}; path=/; Secure`;
-        router.push("/");
+        console.log("res", data);
+
+        if (data.error) {
+          // alert(data.error);
+          setErrorMessage(data?.error);
+          console.log("da", data);
+        } else {
+          setErrorMessage("");
+          document.cookie = `token=${data.token}; path=/; Secure`;
+          document.cookie = `uuid=${data.userId}; path=/; Secure`;
+          router.push("/");
+        }
+      } catch (err) {
+        console.log("error", err);
       }
-    } catch (err) {
-      console.log("error", err);
+    } else {
+      try {
+        const formData = {
+          email: email,
+          password: pass,
+          // role: "student",
+        };
+        const response = await fetch("/api/plogin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        console.log("res", data);
+
+        if (data.error) {
+          // alert(data.error);
+          setErrorMessage(data?.error);
+          console.log("da", data);
+        } else {
+          setErrorMessage("");
+          document.cookie = `token=${data.token}; path=/; Secure`;
+          document.cookie = `uuid=${data.userId}; path=/; Secure`;
+          router.push("/");
+        }
+      } catch (err) {
+        console.log("error", err);
+      }
     }
   };
   return (
