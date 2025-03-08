@@ -164,7 +164,6 @@
 
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface Props {
@@ -173,7 +172,6 @@ interface Props {
 }
 
 export const RegisterForm = ({ setFormState, role }: Props) => {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

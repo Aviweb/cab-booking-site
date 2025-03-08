@@ -14,12 +14,10 @@ import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/shadcn/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
 
 export function UserProfile() {
   const [userLoggedin, setUserLoggedIn] = useState(false);
-  const router = useRouter();
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("token");

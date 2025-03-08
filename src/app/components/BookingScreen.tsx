@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { FaCheckCircle } from "react-icons/fa";
 import BookingSuccessModal from "./BookingSuccessModal";
 
 interface FormInputs {
@@ -16,12 +15,7 @@ interface FormInputs {
 }
 
 const BookingScreen = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<FormInputs>();
+  const { register, handleSubmit, reset } = useForm<FormInputs>();
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [startDate, setStartDate] = useState<Date>(new Date());

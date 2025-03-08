@@ -59,7 +59,7 @@ export async function GET() {
     const bookings = await prisma.bookings.findMany();
     return new Response(JSON.stringify(bookings), { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "hello" }), {
+    return new Response(JSON.stringify({ error }), {
       status: 500,
     });
   }
