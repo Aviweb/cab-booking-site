@@ -1,3 +1,4 @@
+"use client";
 import BookingScreen from "./components/BookingScreen";
 import HomeScreen from "./components/HomeScreen";
 import RouteScreen from "./components/RouteScreen";
