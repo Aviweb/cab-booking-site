@@ -17,7 +17,7 @@ interface FormInputs {
 const BookingScreen = () => {
   const { register, handleSubmit, reset } = useForm<FormInputs>();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [startDate, setStartDate] = useState<Date>(new Date());
 
   const onSubmit: SubmitHandler<FormInputs> = async (userData) => {

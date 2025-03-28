@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 import Navbar from "./Navbar";
 
@@ -10,11 +11,11 @@ const HomeScreen = () => {
     });
   };
   return (
-    <div className="bg-cover bg-center bg-[url('/hero6.png')]">
+    <div className="bg-cover bg-center  bg-[url('/lg2.png')] lg:bg-[url('/hero6.png')] ">
       <Navbar />
       <section
         id="home"
-        className="flex  justify-center w-full pl-[100px]   h-full mt-36   flex-col-reverse lg:flex-row"
+        className="flex  justify-center w-full lg:pl-[100px]   h-full lg:mt-36   flex-col lg:flex-row"
       >
         <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-start h-full  pt-10 lg:pt-0 pb-14">
           <div className="w-full text-center lg:text-left">
@@ -39,7 +40,7 @@ const HomeScreen = () => {
                 onClick={() => {
                   scrollTo("booking");
                 }}
-                className="md:mr-3 py-3 px-9 font-bold text-xl border-2 border-charade-500 rounded-xl my-2 lg:my-0 hover:bg-charade-300 bg-charade-500 text-white focus:outline-none"
+                className="md:mr-3 py-3 px-4 mid:px-9 font-bold text-xl border-2 border-charade-500 rounded-xl my-2 lg:my-0 hover:bg-charade-300 bg-charade-500 text-white focus:outline-none"
               >
                 Book Cab
               </button>
@@ -55,7 +56,13 @@ const HomeScreen = () => {
           </div>
         </div>
         <div className="w-8/12 lg:w-full  justify-center items-center pt-5 lg:pt-0 md:h-full">
-          <img src="/camaro.png" className="h-full w-full mt-36" alt="" />
+          <Image
+            src="/camaro.png"
+            alt="Camaro"
+            width={500} // Set an appropriate width
+            height={500} // Set an appropriate height
+            className="h-full w-full mt-36"
+          />
         </div>
       </section>
     </div>

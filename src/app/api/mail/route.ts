@@ -54,10 +54,43 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const uuid = searchParams.get("uuid"); // Get the UUID from the query params
+
+  console.log("uuis", uuid);
   try {
-    const bookings = await prisma.bookings.findMany();
-    return new Response(JSON.stringify(bookings), { status: 200 });
+    if (!uuid) {
+      const bookings = await prisma.bookings.findMany();
+      return new Response(JSON.stringify(bookings), { status: 200 });
+    } else {
+      // Fetch records matching the UUID
+      const bookings = await prisma.bookings.findMany({
+        where: {
+          id: uuid,
+        },
+      });
+
+      console.log("book", bookings);
+
+      if (bookings.length === 0) {
+        return new Response(
+          JSON.stringify({
+            message: "No entries found for this user",
+            data: [],
+          }),
+          { status: 201, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          message: "Data fetched successfully!",
+          data: bookings,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
   } catch (error) {
     return new Response(JSON.stringify({ error }), {
       status: 500,
