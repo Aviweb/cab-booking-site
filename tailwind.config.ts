@@ -12,6 +12,9 @@ export default {
       fontFamily: {
         sans: "Sen, Helvetica, Arial, sans-serif",
       },
+      screens: {
+        mid: "1240px",
+      },
       clipPath: {
         searchWebPolygon:
           "polygon(0% 0%, 93% 0%, 100% 50%, 100% 100%, 0% 100%)",

@@ -54,15 +54,15 @@ export function UserProfile() {
     });
   };
   return (
-    <NavigationMenu className="translate-x-10">
+    <NavigationMenu className="lg:translate-x-10">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent">
             <div className="flex space-x-2 items-center">
               <User className="w-8 h-8 border-2 rounded-full p-1 border-black text-black" />
-              <p className="text-charade-500 font-semibold">
+              {/* <p className="text-charade-500 font-semibold">
                 {userLoggedin ? "Logout" : "Login"}
-              </p>
+              </p> */}
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
