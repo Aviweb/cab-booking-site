@@ -16,10 +16,19 @@ export async function POST(req: Request) {
       driverId,
       driverName,
       status,
+      userId,
     } = response;
 
     // Validate required fields
-    if (!car || !dateTime || !startLoc || !endLoc || !mobile || !name) {
+    if (
+      !car ||
+      !dateTime ||
+      !startLoc ||
+      !endLoc ||
+      !mobile ||
+      !name ||
+      !userId
+    ) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400 }
@@ -38,6 +47,7 @@ export async function POST(req: Request) {
         name,
         driverId: driverId || null,
         driverName: driverName || null,
+        userId: userId || null,
         status: status || "Pending",
         created_at: new Date(),
       },
@@ -56,44 +66,51 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const uuid = searchParams.get("uuid"); // Get the UUID from the query params
+  const uuid = searchParams.get("uuid");
+  const role = searchParams.get("role");
 
-  console.log("uuis", uuid);
+  console.log("UUID:", uuid, "Role:", role);
+
   try {
-    if (!uuid) {
-      const bookings = await prisma.bookings.findMany();
-      return new Response(JSON.stringify(bookings), { status: 200 });
-    } else {
-      // Fetch records matching the UUID
-      const bookings = await prisma.bookings.findMany({
-        where: {
-          id: uuid,
-        },
+    let bookings;
+
+    if (!uuid || !role) {
+      // Fetch all bookings if uuid or role is missing
+      bookings = await prisma.bookings.findMany();
+    } else if (role === "driver") {
+      // Fetch bookings for the driver
+      bookings = await prisma.bookings.findMany({
+        where: { driverId: uuid },
       });
-
-      console.log("book", bookings);
-
-      if (bookings.length === 0) {
-        return new Response(
-          JSON.stringify({
-            message: "No entries found for this user",
-            data: [],
-          }),
-          { status: 201, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
+    } else if (role === "passenger") {
+      // Fetch bookings for the passenger
+      bookings = await prisma.bookings.findMany({
+        where: { userId: uuid },
+      });
+    } else {
       return new Response(
-        JSON.stringify({
-          message: "Data fetched successfully!",
-          data: bookings,
-        }),
+        JSON.stringify({ message: "Invalid role provided." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!bookings || bookings.length === 0) {
+      return new Response(
+        JSON.stringify({ message: "No entries found", data: [] }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    return new Response(
+      JSON.stringify({ message: "Data fetched successfully!", data: bookings }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error }), {
+    console.error("Error fetching bookings:", error);
+
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
+      headers: { "Content-Type": "application/json" },
     });
   }
 }

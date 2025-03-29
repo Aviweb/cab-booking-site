@@ -1,10 +1,21 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 import Navbar from "./Navbar";
+import Cookies from "universal-cookie";
+import { useEffect } from "react";
 
 const HomeScreen = () => {
+  const [userRole, setUserRole] = useState<"passenger" | "driver" | undefined>(
+    "passenger"
+  );
+  useEffect(() => {
+    const cookies = new Cookies();
+    const role = cookies.get("role");
+    console.log("Role from cookie:", role);
+    setUserRole(role);
+  }, []);
   const scrollTo = (section: string) => {
     document.querySelector(`#${section}`)?.scrollIntoView({
       behavior: "smooth",
@@ -12,7 +23,7 @@ const HomeScreen = () => {
   };
   return (
     <div className="bg-cover bg-center  bg-[url('/lg2.png')] lg:bg-[url('/hero6.png')] ">
-      <Navbar />
+      <Navbar role={userRole} />
       <section
         id="home"
         className="flex  justify-center w-full lg:pl-[100px]   h-full lg:mt-36   flex-col lg:flex-row"

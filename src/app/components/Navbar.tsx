@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import UserProfile from "./UserProfile";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -9,40 +10,45 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 interface NavbarDataProps {
   title: string;
   section: string;
+  href: string;
 }
-// interface NavbarItem {
-//   section: string;
-//   href: string;
-//   name: string;
-// }
 
-const Navbar = () => {
-  // const isOpen = false;
+interface NavbarProps {
+  bgColor?: string;
+  role?: "driver" | "passenger"; // Added role prop
+}
 
+const Navbar = ({ bgColor, role = "passenger" }: NavbarProps) => {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const NavbarButtons: NavbarDataProps[] = [
-    { title: "Home", section: "home" },
-    { title: "Book Cab", section: "booking" },
-    { title: "Routes", section: "routes" },
-    { title: "Contact Us", section: "contact" },
-  ];
+  console.log("role---<", role);
 
-  // const NavbarButtonsDriver: NavbarDataProps[] = [
-  //   { title: "Home", section: "home" },
-  //   { title: "Booking Requests", section: "booking" },
-  //   { title: "Routes", section: "routes" },
-  //   { title: "Contact Us", section: "contact" },
-  // ];
+  // Conditional data rendering
+  const NavbarData: NavbarDataProps[] =
+    role === "driver"
+      ? [
+          { title: "Home", section: "home", href: "/" },
+          {
+            title: "Booking Requests",
+            section: "booking",
+            href: "/booking_requests",
+          },
+          { title: "My Bookings", section: "routes", href: "/my_bookings" },
+        ]
+      : [
+          { title: "Home", section: "home", href: "/" },
+          { title: "Book Cab", section: "booking", href: "/booking_form" },
+          { title: "My Bookings", section: "routes", href: "/my_bookings" },
+        ];
 
-  const scrollTo = (section: string) => {
-    document.querySelector(`#${section}`)?.scrollIntoView({
-      behavior: "smooth",
-    });
-  };
   return (
-    <div className="px-4 lg:px-[100px] w-full flex justify-between  items-center   bg-transparent z-50">
+    <div
+      className={`px-4 lg:px-[100px] w-full flex justify-between items-center ${
+        bgColor ? bgColor : "bg-transparent"
+      } z-50`}
+    >
       <div className="flex justify-between">
-        <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="">
+        <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen}>
           <div className="fixed inset-0 z-50" />
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
@@ -68,20 +74,20 @@ const Navbar = () => {
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
-                  {NavbarButtons.map((item: NavbarDataProps) => (
+                  {NavbarData.map((item) => (
                     <a
-                      key={item?.section}
-                      href={"/"}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                      key={item.section}
+                      href={item.href}
+                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
                     >
-                      {item?.title}
+                      {item.title}
                     </a>
                   ))}
                 </div>
                 <div className="py-6">
                   <a
                     href="#"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
                   >
                     Log in
                   </a>
@@ -109,66 +115,22 @@ const Navbar = () => {
           height={100}
         />
         <div className="hidden lg:flex">
-          {NavbarButtons.map((navItem: NavbarDataProps, index) => (
+          {NavbarData.map((navItem, index) => (
             <button
               key={index}
               className="py-3 inline-block px-6 font-bold hover:bg-gray-100 text-[#262626]"
-              onClick={() => {
-                scrollTo(navItem?.section);
-              }}
+              onClick={() => router.push(navItem.href)}
             >
-              {navItem?.title}
+              {navItem.title}
             </button>
           ))}
         </div>
       </div>
-      {/* <div
-        className={`transition-all origin-top transform   ${`scale-y-0 top-20 md:top-0`}  md:scale-100 block relative md:top-0 bg-transparent text-charade-500`}
-        style={{ width: "auto" }}
-      >
-        <div className="flex justify-end lg:justify-between items-center">
-          <div className="hidden lg:flex">
-            {NavbarButtons.map((navItem: NavbarDataProps, index) => (
-              <button
-                key={index}
-                className="py-3  inline-block px-6 font-bold hover:bg-gray-100  text-[#262626] "
-                onClick={() => {
-                  scrollTo(navItem?.section);
-                }}
-              >
-                {navItem?.title}
-              </button>
-            ))}
-          </div>
-
-          <UserProfile />
-        </div>
-      </div> */}
-      {/* <div
-        className={` bg-transparent text-charade-500 flex items-center`}
-        style={{ width: "auto" }}
-      > */}
-      {/* <div className="flex justify-end lg:justify-between items-center"> */}
-      {/* <div className="hidden lg:flex">
-            {NavbarButtons.map((navItem: NavbarDataProps, index) => (
-              <button
-                key={index}
-                className="py-3 inline-block px-6 font-bold hover:bg-gray-100 text-[#262626]"
-                onClick={() => {
-                  scrollTo(navItem?.section);
-                }}
-              >
-                {navItem?.title}
-              </button>
-            ))}
-          </div> */}
 
       <div className="flex items-center">
         <UserProfile />
       </div>
-      {/* </div> */}
     </div>
-    // </div>
   );
 };
 

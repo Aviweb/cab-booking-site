@@ -48,7 +48,12 @@ export async function POST(req) {
 
   // Return the success response along with the token
   return new Response(
-    JSON.stringify({ success: true, token, userId: user.id }),
+    JSON.stringify({
+      success: true,
+      token,
+      userId: user.id,
+      role: "driver",
+    }),
     {
       status: 200,
     }

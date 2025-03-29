@@ -7,6 +7,7 @@ interface BookingEntry {
   status: string;
   name: string;
   mobile: string;
+  id: string;
 }
 interface BackendData {
   car?: string;
@@ -14,6 +15,7 @@ interface BackendData {
   status?: string;
   name?: string;
   mobile?: string;
+  id: string;
 }
 
 const columns = [
@@ -27,25 +29,27 @@ const columns = [
 export default function DriverBookings() {
   const cookies = new Cookies();
   const uuid = cookies.get("uuid");
+  const role = cookies.get("role");
   const [bookingData, setBookingData] = useState<BookingEntry[]>([]);
   useEffect(() => {
     try {
       const fetchData = async () => {
         // const response = await
-        const response = await fetch(`/api/mail?uuid=${uuid}`, {
+        const response = await fetch(`/api/mail?uuid=${uuid}&role=${role}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
         const res = await response.json();
         console.log("res", res);
 
-        const filteredData = res?.map((item: BackendData) => {
+        const filteredData = res?.data?.map((item: BackendData) => {
           return {
             car: item?.car,
             journeyDate: item?.dateTime,
             status: item?.status,
             name: item?.name,
             mobile: item?.mobile,
+            id: item?.id,
           } as BookingEntry;
         });
 
@@ -55,7 +59,7 @@ export default function DriverBookings() {
     } catch (err) {
       console.log("error", err);
     }
-  }, [uuid]);
+  }, [uuid, role]);
 
   return (
     <div className="px-4 sm:px-6  mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
@@ -156,7 +160,7 @@ export default function DriverBookings() {
                 </thead>
                 <tbody className="bg-white">
                   {bookingData?.map((person) => (
-                    <tr key={person.mobile} className="even:bg-gray-50">
+                    <tr key={person.id} className="even:bg-gray-50">
                       {columns.map((column) => (
                         <td
                           key={column.key}

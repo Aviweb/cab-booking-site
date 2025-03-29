@@ -44,6 +44,7 @@ export const LoginForm = ({ setFormState, role }: props) => {
           setErrorMessage("");
           document.cookie = `token=${data.token}; path=/; Secure`;
           document.cookie = `uuid=${data.userId}; path=/; Secure`;
+          document.cookie = `role=${data.role}; path=/; Secure`;
           router.push("/");
         }
       } catch (err) {
@@ -74,6 +75,7 @@ export const LoginForm = ({ setFormState, role }: props) => {
           setErrorMessage("");
           document.cookie = `token=${data.token}; path=/; Secure`;
           document.cookie = `uuid=${data.userId}; path=/; Secure`;
+          document.cookie = `role=${data.role}; path=/; Secure`;
           router.push("/");
         }
       } catch (err) {
