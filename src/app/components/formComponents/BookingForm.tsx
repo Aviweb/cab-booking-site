@@ -45,7 +45,7 @@ interface FormInputs {
 const BookingForm = () => {
   const { register, handleSubmit, reset } = useForm<FormInputs>();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   // const [startDate, setStartDate] = useState<Date>(new Date());
   const startDate = new Date();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

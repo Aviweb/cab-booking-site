@@ -21,7 +21,6 @@ interface NavbarProps {
 const Navbar = ({ bgColor, role = "passenger" }: NavbarProps) => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  console.log("role---<", role);
 
   // Conditional data rendering
   const NavbarData: NavbarDataProps[] =
@@ -54,13 +53,6 @@ const Navbar = ({ bgColor, role = "passenger" }: NavbarProps) => {
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5">
                 <span className="sr-only">Your Company</span>
-                <Image
-                  alt=""
-                  src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                  className="h-8 w-auto"
-                  width={32}
-                  height={32}
-                />
               </a>
               <button
                 type="button"

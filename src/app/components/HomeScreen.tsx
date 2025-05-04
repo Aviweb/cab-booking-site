@@ -26,13 +26,24 @@ const HomeScreen = () => {
       <Navbar role={userRole} />
       <section
         id="home"
-        className="flex  justify-center w-full lg:pl-[100px]   h-full lg:mt-36   flex-col lg:flex-row"
+        className="flex flex-col-reverse lg:flex-row justify-center w-full lg:pl-[100px] h-full lg:mt-36 px-4"
       >
-        <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-start h-full  pt-10 lg:pt-0 pb-14">
+        {/* Text Content */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-start h-full pt-10 lg:pt-0 pb-14">
           <div className="w-full text-center lg:text-left">
-            <span className="font-extrabold text-charade-500 block my-2 text-5xl">
+            <span className="font-extrabold text-charade-500 block my-2 text-3xl lg:text-5xl">
               Easy and fast way to book a ride
             </span>
+            {/* Image in the middle on small screens */}
+            <div className=" lg:hidden my-6 flex justify-center">
+              <Image
+                src="/camaro4.png"
+                alt="Camaro"
+                width={300}
+                height={300}
+                className="w-10/12 max-w-xs h-auto"
+              />
+            </div>
             <button className="bg-yellow-400 p-2 rounded-lg my-2 inline-block text-charade-500">
               <FaPhoneAlt className="inline -my-1 text-xl" />{" "}
               <span className="font-bold">Call Us</span>
@@ -46,32 +57,33 @@ const HomeScreen = () => {
                 75000 75000
               </a>
             </div>
-            <div className="flex my-5 md:my-7 flex-col md:flex-row justify-center lg:justify-start">
+            <div className="flex flex-col md:flex-row gap-3 justify-center lg:justify-start my-5 mx-16 lg:mx-0 md:my-7">
               <button
                 onClick={() => {
                   scrollTo("booking");
                 }}
-                className="md:mr-3 py-3 px-4 mid:px-9 font-bold text-xl border-2 border-charade-500 rounded-xl my-2 lg:my-0 hover:bg-charade-300 bg-charade-500 text-white focus:outline-none"
+                className="w-full md:w-auto py-2  lg:py-3 px-6 font-bold text-lg border-2 border-charade-500 rounded-xl bg-charade-500 text-white hover:bg-charade-300 focus:outline-none"
               >
                 Book Cab
               </button>
               <a
                 href="https://wa.me/+917906217117?text=Hello%20there!"
                 target="_blank"
-                className="p-3 text-charade-500 font-bold text-xl border-2 border-charade-500 rounded-xl my-2 lg:my-0 hover:bg-charade-500 hover:text-white"
+                className="w-full bg-white md:w-auto py-3 px-6 font-bold text-lg border lg:border-2 border-charade-500 rounded-xl text-charade-500 hover:bg-charade-500 hover:text-white flex items-center justify-center"
               >
-                <FaWhatsapp className="inline-block -my-2 mr-1 text-2xl" />
+                <FaWhatsapp className="mr-2 text-2xl" />
                 Contact Us
               </a>
             </div>
           </div>
         </div>
-        <div className="w-8/12 lg:w-full  justify-center items-center pt-5 lg:pt-0 md:h-full">
+        {/* Image for large screens only */}
+        <div className="hidden lg:flex w-full justify-center items-center pt-5 mt-5 lg:pt-0 md:h-full">
           <Image
             src="/camaro.png"
             alt="Camaro"
-            width={500} // Set an appropriate width
-            height={500} // Set an appropriate height
+            width={500}
+            height={500}
             className="h-full w-full mt-36"
           />
         </div>
