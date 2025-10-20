@@ -26,7 +26,7 @@ import {
   TabsTrigger,
 } from "@/components/shadcn/ui/tabs";
 import { Separator } from "@/components/shadcn/ui/separator";
-import CustomDropDown from "../components/formComponents/CustomDropDown";
+import CustomDropDown from "./formComponents/CustomDropDown";
 
 interface RouteInfo {
   distance: number; // in meters
