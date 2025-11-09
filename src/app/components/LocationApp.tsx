@@ -55,8 +55,11 @@ export default function LocationApp({ mode }: props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [secondLocation, setSecondLocation] = useState<any>(null);
   const [mapLink, setMapLink] = useState("");
+  const [startMapLink, setStartMapLink] = useState("");
   const [loading, setLoading] = useState(false);
   const [linkLoading, setLinkLoading] = useState(false);
+  const [startLinkLoading, setStartLinkLoading] = useState(false);
+  const [startLinkError, setStartLinkError] = useState<string | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [linkError, setLinkError] = useState<string | null>(null);
@@ -104,9 +107,17 @@ export default function LocationApp({ mode }: props) {
     );
   };
 
-  const parseGoogleMapsLink = (link: string) => {
-    setLinkLoading(true);
-    setLinkError(null);
+  const parseGoogleMapsLink = (
+    link: string,
+    isStartLocation: boolean = false
+  ) => {
+    if (isStartLocation) {
+      setStartLinkLoading(true);
+      setStartLinkError(null);
+    } else {
+      setLinkLoading(true);
+      setLinkError(null);
+    }
 
     try {
       let latitude, longitude;
@@ -139,19 +150,35 @@ export default function LocationApp({ mode }: props) {
         longitude >= -180 &&
         longitude <= 180
       ) {
-        const newSecondLocation = { latitude, longitude };
-        setSecondLocation(newSecondLocation);
-
-        setLinkLoading(false);
+        const newLocation = { latitude, longitude };
+        if (isStartLocation) {
+          setLocation(newLocation);
+          setStartLinkLoading(false);
+        } else {
+          setSecondLocation(newLocation);
+          setLinkLoading(false);
+        }
         return true;
       } else {
-        setLinkError("Could not extract valid coordinates from the link");
-        setLinkLoading(false);
+        const errorMsg = "Could not extract valid coordinates from the link";
+        if (isStartLocation) {
+          setStartLinkError(errorMsg);
+          setStartLinkLoading(false);
+        } else {
+          setLinkError(errorMsg);
+          setLinkLoading(false);
+        }
         return false;
       }
-    } catch (err) {
-      setLinkError("Failed to parse Google Maps link");
-      setLinkLoading(false);
+    } catch {
+      const errorMsg = "Failed to parse Google Maps link";
+      if (isStartLocation) {
+        setStartLinkError(errorMsg);
+        setStartLinkLoading(false);
+      } else {
+        setLinkError(errorMsg);
+        setLinkLoading(false);
+      }
       return false;
     }
   };
@@ -224,9 +251,18 @@ export default function LocationApp({ mode }: props) {
   const handleSubmitLink = (e: React.FormEvent) => {
     e.preventDefault();
     if (mapLink.trim()) {
-      parseGoogleMapsLink(mapLink);
+      parseGoogleMapsLink(mapLink, false);
     } else {
       setLinkError("Please enter a Google Maps link");
+    }
+  };
+
+  const handleSubmitStartLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (startMapLink.trim()) {
+      parseGoogleMapsLink(startMapLink, true);
+    } else {
+      setStartLinkError("Please enter a Google Maps link");
     }
   };
 
@@ -265,21 +301,19 @@ export default function LocationApp({ mode }: props) {
             destination
           </CardDescription>
         </CardHeader>
-        <CardContent
-          className={`space-y-4  ${
-            mode === "homescreen"
-              ? "md:flex justify-between md:space-x-10 md:pl-28"
-              : ""
-          } w-full`}
-        >
+        <CardContent className="space-y-4 w-full">
           {error && (
             <Alert variant="destructive">
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <div className="">
-            <div className="">
+          <div
+            className={
+              mode === "homescreen" ? "md:flex md:space-x-6 md:items-start" : ""
+            }
+          >
+            <div className={mode === "homescreen" ? "md:flex-1" : ""}>
               <p>Starting Point</p>
               <CustomDropDown
                 dropDownOptions={locations}
@@ -287,23 +321,50 @@ export default function LocationApp({ mode }: props) {
                 setSelected={setLocation}
               />
               <p className="text-center my-2">Or</p>
-              <Button
-                onClick={getLocation}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Getting location...
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="mr-2 h-4 w-4" />
-                    {location ? "Use current location" : "Get my location"}
-                  </>
-                )}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button
+                  onClick={getLocation}
+                  disabled={loading}
+                  className="w-full sm:flex-1"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Getting location...
+                    </>
+                  ) : (
+                    <>
+                      <MapPin className="mr-2 h-4 w-4" />
+                      {location ? "Use current location" : "Get my location"}
+                    </>
+                  )}
+                </Button>
+                <form
+                  onSubmit={handleSubmitStartLink}
+                  className="w-full sm:flex-1 flex gap-2"
+                >
+                  <Input
+                    id="start-map-link"
+                    value={startMapLink}
+                    onChange={(e) => setStartMapLink(e.target.value)}
+                    placeholder="Paste Google Maps link"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={startLinkLoading || !startMapLink.trim()}
+                  >
+                    {startLinkLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Parse"
+                    )}
+                  </Button>
+                </form>
+              </div>
+              {startLinkError && (
+                <p className="text-xs text-destructive">{startLinkError}</p>
+              )}
 
               <div className="mt-2 rounded-md bg-muted p-3">
                 <p className="text-sm font-medium">Your coordinates:</p>
@@ -316,7 +377,11 @@ export default function LocationApp({ mode }: props) {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div
+              className={`space-y-2 ${
+                mode === "homescreen" ? "md:flex-1 mt-4 md:mt-0" : ""
+              }`}
+            >
               <p>Destination</p>
               <CustomDropDown
                 dropDownOptions={locations}
