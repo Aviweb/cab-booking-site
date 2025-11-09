@@ -32,33 +32,54 @@ export default function DriverBookings() {
   const role = cookies.get("role");
   const [bookingData, setBookingData] = useState<BookingEntry[]>([]);
   useEffect(() => {
-    try {
-      const fetchData = async () => {
-        // const response = await
-        const response = await fetch(`/api/mail?uuid=${uuid}&role=${role}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const res = await response.json();
-        console.log("res", res);
+    const fetchData = async () => {
+      try {
+        if (!uuid || !role) {
+          console.log("DriverBookings - Missing uuid or role:", { uuid, role });
+          return;
+        }
 
-        const filteredData = res?.data?.map((item: BackendData) => {
+        console.log("DriverBookings - Fetching bookings for:", { uuid, role });
+
+        const response = await fetch(
+          `/api/bookings?uuid=${uuid}&role=${role}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
+
+        const res = await response.json();
+        console.log("DriverBookings - Response:", res);
+
+        if (!response.ok || !res.success) {
+          throw new Error(res.error || "Failed to fetch bookings");
+        }
+
+        const bookings = res.data || [];
+        console.log("DriverBookings - Bookings received:", bookings.length);
+
+        const filteredData = bookings.map((item: BackendData) => {
           return {
-            car: item?.car,
-            journeyDate: item?.dateTime,
-            status: item?.status,
-            name: item?.name,
-            mobile: item?.mobile,
+            car: item?.car || "",
+            journeyDate: item?.dateTime || "",
+            status: item?.status || "Pending",
+            name: item?.name || "",
+            mobile: item?.mobile || "",
             id: item?.id,
           } as BookingEntry;
         });
 
+        console.log("DriverBookings - Filtered data:", filteredData);
         setBookingData(filteredData);
-      };
-      fetchData();
-    } catch (err) {
-      console.log("error", err);
-    }
+      } catch (err) {
+        console.error("DriverBookings - Error fetching bookings:", err);
+        setBookingData([]);
+      }
+    };
+
+    fetchData();
   }, [uuid, role]);
 
   return (

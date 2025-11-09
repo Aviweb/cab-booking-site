@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserProfile from "./UserProfile";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
+import Cookies from "universal-cookie";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -15,14 +15,20 @@ interface NavbarDataProps {
 
 interface NavbarProps {
   bgColor?: string;
-  role?: "driver" | "passenger"; // Added role prop
 }
 
-const Navbar = ({ bgColor, role = "passenger" }: NavbarProps) => {
+const Navbar = ({ bgColor }: NavbarProps) => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [role, setRole] = useState<"driver" | "passenger" | null>(null);
 
-  // Conditional data rendering
+  useEffect(() => {
+    const cookies = new Cookies();
+    const userRole = cookies.get("role") as "driver" | "passenger" | undefined;
+    setRole(userRole || null);
+  }, []);
+
+  // Conditional data rendering based on role from cookies
   const NavbarData: NavbarDataProps[] =
     role === "driver"
       ? [

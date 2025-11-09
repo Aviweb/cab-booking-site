@@ -13,79 +13,111 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (role === "driver") {
-      if (!name || !email || !password || !confirmPassword) {
-        setErrorMessage("*All fields are required");
+    // Clear previous errors
+    setErrorMessage("");
+
+    // Client-side validation
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address");
+      return;
+    }
+
+    // Password validation
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setErrorMessage("Password must contain at least one uppercase letter");
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setErrorMessage("Password must contain at least one lowercase letter");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setErrorMessage("Password must contain at least one number");
+      return;
+    }
+
+    // Password match validation
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = {
+        name: name.trim(),
+        email: email.trim(),
+        password: password,
+      };
+
+      const apiEndpoint =
+        role === "driver" ? "/api/dregister" : "/api/pregister";
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success || data.error) {
+        // Handle different error types
+        const errorMsg =
+          data.error ||
+          data.message ||
+          "Registration failed. Please try again.";
+        setErrorMessage(errorMsg);
         return;
       }
-      if (password !== confirmPassword) {
-        setErrorMessage("*Passwords do not match");
-        return;
-      }
 
-      try {
-        const formData = { name, email, password };
+      // Success - show success message and switch to login
+      setErrorMessage("");
+      setFormState("login");
 
-        const response = await fetch("/api/dregister", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          setErrorMessage(data.error);
-        } else {
-          setErrorMessage("");
-          window.location.reload();
-        }
-      } catch (err) {
-        console.error("Registration error:", err);
-        setErrorMessage("Something went wrong. Please try again.");
-      }
-    } else {
-      if (!name || !email || !password || !confirmPassword) {
-        setErrorMessage("*All fields are required");
-        return;
-      }
-      if (password !== confirmPassword) {
-        setErrorMessage("*Passwords do not match");
-        return;
-      }
-
-      try {
-        const formData = { name, email, password };
-
-        const response = await fetch("/api/pregister", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          setErrorMessage(data.error);
-        } else {
-          setErrorMessage("");
-          window.location.reload();
-        }
-      } catch (err) {
-        console.error("Registration error:", err);
-        setErrorMessage("Something went wrong. Please try again.");
-      }
+      // Show success message briefly
+      setTimeout(() => {
+        alert("Registration successful! Please login with your credentials.");
+      }, 100);
+    } catch (err) {
+      console.error("Registration error:", err);
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Network error. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="p-6 space-y-4 md:space-y-6 sm:p-8 shadow-xl border rounded-md">
       <div className="w-full text-center">
-        <p className="text-red-500">{errorMessage}</p>
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {errorMessage}
+          </div>
+        )}
         <Image
           width={96}
           height={60}
@@ -104,7 +136,7 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
           >
             Full Name
           </label>
@@ -113,8 +145,15 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
             id="name"
             placeholder="John Doe"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => {
+              setName(e.target.value);
+              setErrorMessage(""); // Clear error when user types
+            }}
+            required
+            className={`w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white ${
+              errorMessage ? "border-red-500" : "border-gray-300"
+            }`}
+            disabled={loading}
           />
         </div>
 
@@ -122,17 +161,24 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
           >
             Your email
           </label>
           <input
-            type="text"
+            type="email"
             id="email"
             placeholder="name@company.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMessage(""); // Clear error when user types
+            }}
+            required
+            className={`w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white ${
+              errorMessage ? "border-red-500" : "border-gray-300"
+            }`}
+            disabled={loading}
           />
         </div>
 
@@ -140,7 +186,7 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
           >
             Password
           </label>
@@ -149,16 +195,26 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
             id="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrorMessage(""); // Clear error when user types
+            }}
+            required
+            className={`w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white ${
+              errorMessage ? "border-red-500" : "border-gray-300"
+            }`}
+            disabled={loading}
           />
+          <p className="mt-1 text-xs text-gray-500">
+            Must be at least 8 characters with uppercase, lowercase, and number
+          </p>
         </div>
 
         {/* Confirm Password Field */}
         <div>
           <label
             htmlFor="confirm-password"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
+            className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
           >
             Confirm Password
           </label>
@@ -167,17 +223,25 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
             id="confirm-password"
             placeholder="••••••••"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setErrorMessage(""); // Clear error when user types
+            }}
+            required
+            className={`w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white ${
+              errorMessage ? "border-red-500" : "border-gray-300"
+            }`}
+            disabled={loading}
           />
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full px-5 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none"
+          disabled={loading}
+          className="w-full px-5 py-2.5 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Sign Up
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
 
         {/* Switch to Login */}

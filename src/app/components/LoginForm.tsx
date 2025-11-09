@@ -1,92 +1,93 @@
 "use client";
 import React, { SetStateAction, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 interface props {
   setFormState: React.Dispatch<SetStateAction<string>>;
   role?: string;
 }
 
 export const LoginForm = ({ setFormState, role }: props) => {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (email === "" || pass === "") {
-      setErrorMessage("*Fill all the fields");
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    // Clear previous errors
+    setErrorMessage("");
+
+    // Client-side validation
+    if (!email.trim() || !pass.trim()) {
+      setErrorMessage("Please fill in all fields");
       return;
     }
 
-    if (role === "driver") {
-      try {
-        const formData = {
-          email: email,
-          password: pass,
-          // role: "student",
-        };
-        const response = await fetch("/api/dlogin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address");
+      return;
+    }
 
-        const data = await response.json();
+    setLoading(true);
 
-        console.log("res", data);
+    try {
+      const formData = {
+        email: email.trim(),
+        password: pass,
+      };
 
-        if (data.error) {
-          // alert(data.error);
-          setErrorMessage(data?.error);
-          console.log("da", data);
-        } else {
-          setErrorMessage("");
-          document.cookie = `token=${data.token}; path=/; Secure`;
-          document.cookie = `uuid=${data.userId}; path=/; Secure`;
-          document.cookie = `role=${data.role}; path=/; Secure`;
-          router.push("/");
-        }
-      } catch (err) {
-        console.log("error", err);
+      const apiEndpoint = role === "driver" ? "/api/dlogin" : "/api/plogin";
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+        credentials: "include", // Important: Include cookies in the request
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success || data.error) {
+        // Handle different error types
+        const errorMsg =
+          data.error || data.message || "Login failed. Please try again.";
+        setErrorMessage(errorMsg);
+        return;
       }
-    } else {
-      try {
-        const formData = {
-          email: email,
-          password: pass,
-          // role: "student",
-        };
-        const response = await fetch("/api/plogin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
 
-        const data = await response.json();
+      // Success - cookies are already set by the server in the response headers
+      // No need to set them client-side
+      setErrorMessage("");
 
-        console.log("res", data);
+      // Small delay to ensure cookies are set before redirect
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-        if (data.error) {
-          // alert(data.error);
-          setErrorMessage(data?.error);
-          console.log("da", data);
-        } else {
-          setErrorMessage("");
-          document.cookie = `token=${data.token}; path=/; Secure`;
-          document.cookie = `uuid=${data.userId}; path=/; Secure`;
-          document.cookie = `role=${data.role}; path=/; Secure`;
-          router.push("/");
-        }
-      } catch (err) {
-        console.log("error", err);
-      }
+      // Redirect to home page
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Network error. Please check your connection and try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
   return (
-    <div className="p-6 space-y-4 md:space-y-6 sm:p-8 shadow-xl border rounded-md">
+    <form
+      onSubmit={handleSubmit}
+      className="p-6 space-y-4 md:space-y-6 sm:p-8 shadow-xl border rounded-md"
+    >
       <div className="w-full">
-        <p className="text-red-500">{errorMessage}</p>
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {errorMessage}
+          </div>
+        )}
         <Image
           width={96}
           height={60}
@@ -106,15 +107,20 @@ export const LoginForm = ({ setFormState, role }: props) => {
           Your email
         </label>
         <input
-          // type="email"
+          type="email"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
+            setErrorMessage(""); // Clear error when user types
           }}
           name="email"
           id="email"
-          className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          required
+          className={`bg-gray-50 border ${
+            errorMessage ? "border-red-500" : "border-gray-300"
+          } text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
           placeholder="name@company.com"
+          disabled={loading}
         />
       </div>
       <div>
@@ -130,21 +136,27 @@ export const LoginForm = ({ setFormState, role }: props) => {
           value={pass}
           onChange={(e) => {
             setPass(e.target.value);
+            setErrorMessage(""); // Clear error when user types
           }}
           id="password"
+          required
           placeholder="••••••••"
-          className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className={`bg-gray-50 border ${
+            errorMessage ? "border-red-500" : "border-gray-300"
+          } text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+          disabled={loading}
         />
       </div>
 
       <button
-        onClick={handleSubmit}
-        className="w-full bg-black text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        type="submit"
+        disabled={loading}
+        className="w-full bg-black text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        Sign in
+        {loading ? "Signing in..." : "Sign in"}
       </button>
       <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-        Don’t have an account yet?
+        Don&apos;t have an account yet?
         <span
           onClick={() => {
             setFormState("register");
@@ -154,7 +166,7 @@ export const LoginForm = ({ setFormState, role }: props) => {
           Sign up
         </span>
       </p>
-    </div>
+    </form>
   );
 };
 
