@@ -28,7 +28,6 @@ const Navbar = ({ bgColor }: NavbarProps) => {
     setRole(userRole || null);
   }, []);
 
-  // Conditional data rendering based on role from cookies
   const NavbarData: NavbarDataProps[] =
     role === "driver"
       ? [

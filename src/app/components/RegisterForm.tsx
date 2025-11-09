@@ -18,23 +18,19 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous errors
     setErrorMessage("");
 
-    // Client-side validation
     if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       setErrorMessage("All fields are required");
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrorMessage("Please enter a valid email address");
       return;
     }
 
-    // Password validation
     if (password.length < 8) {
       setErrorMessage("Password must be at least 8 characters long");
       return;
@@ -55,7 +51,6 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
       return;
     }
 
-    // Password match validation
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
       return;
@@ -81,7 +76,6 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
       const data = await response.json();
 
       if (!response.ok || !data.success || data.error) {
-        // Handle different error types
         const errorMsg =
           data.error ||
           data.message ||
@@ -90,11 +84,9 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
         return;
       }
 
-      // Success - show success message and switch to login
       setErrorMessage("");
       setFormState("login");
 
-      // Show success message briefly
       setTimeout(() => {
         alert("Registration successful! Please login with your credentials.");
       }, 100);
@@ -147,7 +139,7 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
             value={name}
             onChange={(e) => {
               setName(e.target.value);
-              setErrorMessage(""); // Clear error when user types
+              setErrorMessage("");
             }}
             required
             className={`w-full p-2.5 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white ${

@@ -1,12 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "../../components/shadcn/ui/navigation-menu";
@@ -20,33 +18,12 @@ export function UserProfile() {
   const [userLoggedin, setUserLoggedIn] = useState(false);
   useEffect(() => {
     const cookies = new Cookies();
-    const token = cookies.get("token");
-    console.log("Token:", token);
-
-    // const uuid = "4517f629-c687-4731-9e3c-f273c15098ad";
     const uuid = cookies.get("uuid");
     if (uuid) setUserLoggedIn(true);
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch(`/api/submitGatePass?hostel=${hostel}`);
-    //     const responseData = await response.json();
-    //     if (response) {
-    //       console.log("re", responseData?.data);
-
-    //       // setstudentData(responseData?.data);
-    //     }
-    //   } catch (err) {
-    //     console.log("error ", err);
-    //   }
-    // };
-    // fetchData();
   }, []);
 
   const clearCookies = () => {
-    // Get all cookies
     const cookies = document.cookie.split(";");
-
-    // Loop through and remove each cookie
     cookies.forEach((cookie) => {
       const eqPos = cookie.indexOf("=");
       const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
@@ -60,9 +37,6 @@ export function UserProfile() {
           <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent px-0 lg:px-auto">
             <div className="flex space-x-2 items-center">
               <User className="w-8 h-8 border-2 rounded-full p-1 border-black text-black" />
-              {/* <p className="text-charade-500 font-semibold">
-                {userLoggedin ? "Logout" : "Login"}
-              </p> */}
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -109,31 +83,5 @@ export function UserProfile() {
     </NavigationMenu>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
 
 export default UserProfile;

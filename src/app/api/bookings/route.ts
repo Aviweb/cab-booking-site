@@ -54,21 +54,11 @@ export async function GET(req: NextRequest) {
     const uuid = searchParams.get("uuid");
     const role = searchParams.get("role");
 
-    // Debug logging
-    if (process.env.NODE_ENV === "development") {
-      console.log("GET /api/bookings - UUID:", uuid, "Role:", role);
-    }
-
     const bookingService = new BookingService();
     const bookings = await bookingService.getBookings(
       uuid || undefined,
       role || undefined
     );
-
-    // Debug logging
-    if (process.env.NODE_ENV === "development") {
-      console.log("GET /api/bookings - Bookings found:", bookings?.length || 0);
-    }
 
     return NextResponse.json(
       {

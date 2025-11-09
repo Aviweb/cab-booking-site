@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
     const authService = new AuthService();
     const result = await authService.loginDriver({ email, password });
 
-    // Set secure cookies using NextResponse for proper cookie handling
     const nextResponse = NextResponse.json(
       {
         success: true,
@@ -19,23 +18,26 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    // Set cookies with proper attributes
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax" as const,
       path: "/",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60,
     };
+
+    if (!result.token || result.token.trim() === "") {
+      throw new Error("Token generation failed");
+    }
 
     nextResponse.cookies.set("token", result.token, cookieOptions);
     nextResponse.cookies.set("uuid", result.userId, {
       ...cookieOptions,
-      httpOnly: false, // uuid can be accessed client-side if needed
+      httpOnly: false,
     });
     nextResponse.cookies.set("role", result.role, {
       ...cookieOptions,
-      httpOnly: false, // role can be accessed client-side if needed
+      httpOnly: false,
     });
 
     return nextResponse;

@@ -15,16 +15,13 @@ export const LoginForm = ({ setFormState, role }: props) => {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    // Clear previous errors
     setErrorMessage("");
 
-    // Client-side validation
     if (!email.trim() || !pass.trim()) {
       setErrorMessage("Please fill in all fields");
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrorMessage("Please enter a valid email address");
@@ -50,21 +47,14 @@ export const LoginForm = ({ setFormState, role }: props) => {
       const data = await response.json();
 
       if (!response.ok || !data.success || data.error) {
-        // Handle different error types
         const errorMsg =
           data.error || data.message || "Login failed. Please try again.";
         setErrorMessage(errorMsg);
         return;
       }
 
-      // Success - cookies are already set by the server in the response headers
-      // No need to set them client-side
       setErrorMessage("");
-
-      // Small delay to ensure cookies are set before redirect
       await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // Redirect to home page
       window.location.href = "/";
     } catch (err) {
       console.error("Login error:", err);
@@ -111,7 +101,7 @@ export const LoginForm = ({ setFormState, role }: props) => {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            setErrorMessage(""); // Clear error when user types
+            setErrorMessage("");
           }}
           name="email"
           id="email"

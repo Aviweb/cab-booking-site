@@ -19,7 +19,6 @@ export class BookingService {
   }
 
   async createBooking(data: CreateBookingData) {
-    // Validate required fields
     Validator.required(data.car, "Car");
     Validator.required(data.startLoc, "Start location");
     Validator.required(data.endLoc, "End location");
@@ -27,15 +26,12 @@ export class BookingService {
     Validator.required(data.name, "Name");
     Validator.required(data.userId, "User ID");
 
-    // Validate mobile number
     if (!Validator.mobile(data.mobile)) {
       throw new ValidationError("Invalid mobile number format");
     }
 
-    // Validate date
     const dateTime = Validator.dateTime(data.dateTime);
 
-    // Validate locations are different
     if (data.startLoc === data.endLoc) {
       throw new ValidationError("Start and end locations must be different");
     }
@@ -74,7 +70,6 @@ export class BookingService {
   ) {
     const booking = await this.bookingRepository.findById(bookingId);
 
-    // Business logic: Only pending bookings can be accepted/rejected
     if (
       booking.status !== "Pending" &&
       (status === "Accepted" || status === "Rejected")
@@ -84,7 +79,6 @@ export class BookingService {
       );
     }
 
-    // Business logic: Only the assigned driver can update status
     if (
       booking.driverId &&
       booking.driverId !== driverId &&
@@ -99,7 +93,6 @@ export class BookingService {
       status,
     };
 
-    // Set driver when accepting
     if (status === "Accepted") {
       updateData.driverId = driverId;
       updateData.driverName = driverName;
@@ -111,7 +104,6 @@ export class BookingService {
   async cancelBooking(bookingId: string, userId: string, role: string) {
     const booking = await this.bookingRepository.findById(bookingId);
 
-    // Business logic: Only passenger or assigned driver can cancel
     if (role === "passenger" && booking.userId !== userId) {
       throw new AuthorizationError("You can only cancel your own bookings");
     }
@@ -122,7 +114,6 @@ export class BookingService {
       );
     }
 
-    // Business logic: Cannot cancel completed bookings
     if (booking.status === "Completed") {
       throw new ValidationError("Cannot cancel completed bookings");
     }

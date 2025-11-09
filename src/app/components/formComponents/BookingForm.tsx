@@ -82,7 +82,6 @@ const BookingForm = () => {
   const onSubmit: SubmitHandler<FormInputs> = async (userData) => {
     setError(null);
 
-    // Validation
     if (!startLoc) {
       setError("Please select a start location");
       return;

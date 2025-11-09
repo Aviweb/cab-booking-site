@@ -10,7 +10,6 @@ export class Validator {
   }
 
   static mobile(mobile: string): boolean {
-    // Indian mobile number validation (10 digits, optionally with country code)
     const mobileRegex = /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/;
     return mobileRegex.test(mobile.replace(/\s/g, ""));
   }

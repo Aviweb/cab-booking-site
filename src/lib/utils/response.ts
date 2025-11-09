@@ -48,7 +48,6 @@ export function errorResponse(
   const status = statusCode || (isAppError ? error.statusCode : 500);
   const message = isAppError ? error.message : "Internal server error";
 
-  // Log non-operational errors
   if (!isAppError || !error.isOperational) {
     console.error("Error:", error);
   }

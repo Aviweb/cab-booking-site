@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-// Singleton pattern for PrismaClient
-// Prevents multiple instances in development (hot reload) and production
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
