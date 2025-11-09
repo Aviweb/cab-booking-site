@@ -69,11 +69,11 @@ export default function Footer({ className }: props) {
 
           <div className="bg-charade-500">
             <div className=" py-4 flex flex-col md:flex-row justify-around pt-[78px] pb-7 lg:pt-[95px] lg:pb-[2px]">
-              <div className="px-2 flex justify-center flex-col items-center">
-                <span className="text-charade-100 block my-2 text-center md:text-left">
+              <div className="px-2 flex justify-center flex-col items-center md:items-start">
+                <span className="text-charade-100 block my-2 font-bold">
                   Contact Us
                 </span>
-                <div className="inline-block">
+                <div className=" flex flex-col md:items-start items-center">
                   <span className="text-[#d5d5d1] font-bold text-xl block mb-2">
                     <FaUser className="inline -mt-1 mr-2" /> Avi Rajput
                   </span>

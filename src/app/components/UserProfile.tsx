@@ -57,7 +57,7 @@ export function UserProfile() {
     <NavigationMenu className="lg:translate-x-10">
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent">
+          <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent px-0 lg:px-auto">
             <div className="flex space-x-2 items-center">
               <User className="w-8 h-8 border-2 rounded-full p-1 border-black text-black" />
               {/* <p className="text-charade-500 font-semibold">

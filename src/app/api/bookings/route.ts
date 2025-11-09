@@ -1,15 +1,12 @@
 /**
- * @deprecated This route is deprecated. Use /api/bookings instead.
- * Kept for backward compatibility
+ * Bookings API Route
+ * Handles booking CRUD operations
  */
 
 import { BookingService } from "@/lib/services/BookingService";
-import {
-  handleApiRequest,
-  createdResponse,
-  successResponse,
-} from "@/lib/utils/response";
-import { NextRequest } from "next/server";
+import { handleApiRequest, createdResponse } from "@/lib/utils/response";
+import { NextRequest, NextResponse } from "next/server";
+import { ValidationError } from "@/lib/errors";
 
 export async function POST(req: NextRequest) {
   return handleApiRequest(async () => {
@@ -52,10 +49,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  return handleApiRequest(async () => {
+  try {
     const { searchParams } = new URL(req.url);
     const uuid = searchParams.get("uuid");
     const role = searchParams.get("role");
+
+    // Debug logging
+    if (process.env.NODE_ENV === "development") {
+      console.log("GET /api/bookings - UUID:", uuid, "Role:", role);
+    }
 
     const bookingService = new BookingService();
     const bookings = await bookingService.getBookings(
@@ -63,6 +65,32 @@ export async function GET(req: NextRequest) {
       role || undefined
     );
 
-    return successResponse(bookings, "Bookings fetched successfully");
-  });
+    // Debug logging
+    if (process.env.NODE_ENV === "development") {
+      console.log("GET /api/bookings - Bookings found:", bookings?.length || 0);
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: bookings,
+        message: "Bookings fetched successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("GET /api/bookings - Error:", error);
+
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

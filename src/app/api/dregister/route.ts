@@ -1,65 +1,22 @@
-import { hash } from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+import { AuthService } from "@/lib/services/AuthService";
+import { handleApiRequest, createdResponse } from "@/lib/utils/response";
+import { NextRequest } from "next/server";
 
-const prisma = new PrismaClient();
+export async function POST(req: NextRequest) {
+  return handleApiRequest(async () => {
+    const body = await req.json();
+    const { name, email, password } = body;
 
-export async function POST(req: Request) {
-  const response = await req.json();
+    const authService = new AuthService();
+    const result = await authService.registerDriver({ name, email, password });
 
-  // Destructuring name, email, and password from the request body
-  const { name, email, password } = response;
-
-  // Check if all required fields are provided
-  if (!name || !email || !password) {
-    return new Response(JSON.stringify({ error: "Missing fields" }), {
-      status: 400,
-    });
-  }
-
-  try {
-    // Check if a driver already exists with the same name and email
-    const existingUser = await prisma.drivers.findFirst({
-      where: { name, email },
-    });
-
-    const existingEmail = await prisma.drivers.findFirst({
-      where: { email },
-    });
-
-    if (existingUser || existingEmail) {
-      return new Response(JSON.stringify({ error: "User already exists" }), {
-        status: 409, // Conflict
-      });
-    }
-
-    // Hash the password before storing it
-    const hashedPassword = await hash(password, 10);
-
-    console.log("hash", hashedPassword);
-
-    // Create a new driver entry in the database
-    const newUser = await prisma.drivers.create({
-      data: {
-        id: uuidv4(),
-        name,
-        email,
-        password: hashedPassword,
-        created_at: new Date(),
+    return createdResponse(
+      {
+        userId: result.userId,
+        name: result.name,
+        message: "Driver registered successfully",
       },
-    });
-    console.log("data", newUser);
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "User registered successfully",
-        userId: newUser.id,
-      }),
-      { status: 201 }
+      "Registration successful"
     );
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error }), {
-      status: 500,
-    });
-  }
+  });
 }

@@ -1,5 +1,5 @@
 "use client";
-import LocationApp from "@/app/test/page";
+import LocationApp from "@/app/components/LocationApp";
 import BookingForm from "./BookingForm";
 
 export default function BookingSection() {

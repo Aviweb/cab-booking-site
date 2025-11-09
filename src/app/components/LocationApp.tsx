@@ -26,7 +26,7 @@ import {
   TabsTrigger,
 } from "@/components/shadcn/ui/tabs";
 import { Separator } from "@/components/shadcn/ui/separator";
-import CustomDropDown from "../components/formComponents/CustomDropDown";
+import CustomDropDown from "./formComponents/CustomDropDown";
 
 interface RouteInfo {
   distance: number; // in meters
@@ -34,8 +34,10 @@ interface RouteInfo {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   geometry?: any; // route geometry
 }
-
-export default function LocationApp() {
+interface props {
+  mode?: string;
+}
+export default function LocationApp({ mode }: props) {
   // const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(
   //   null
   // );
@@ -267,107 +269,122 @@ export default function LocationApp() {
 
   return (
     <div className="flex  items-start justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card
+        className={` w-full ${
+          mode === "homescreen" ? "max-w-full border-none bg-transparent" : ""
+        }`}
+      >
+        <CardHeader className="flex items-center">
+          <CardTitle className="flex items-center gap-2 text-center">
             <MapPin className="h-5 w-5 text-primary" />
             Location Distance Calculator
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-center">
             Calculate road distance between your starting location and
             destination
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent
+          className={`space-y-4  ${
+            mode === "homescreen"
+              ? "md:flex justify-between md:space-x-10 md:pl-28"
+              : ""
+          } w-full`}
+        >
           {error && (
             <Alert variant="destructive">
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
           <div className="">
-            <p>Starting Point</p>
-            <CustomDropDown
-              dropDownOptions={locations}
-              selected={location}
-              setSelected={setLocation}
-            />
-            <p className="text-center my-2">Or</p>
-            <Button onClick={getLocation} disabled={loading} className="w-full">
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Getting location...
-                </>
-              ) : (
-                <>
-                  <MapPin className="mr-2 h-4 w-4" />
-                  {location ? "Update my location" : "Get my location"}
-                </>
-              )}
-            </Button>
+            <div className="">
+              <p>Starting Point</p>
+              <CustomDropDown
+                dropDownOptions={locations}
+                selected={location}
+                setSelected={setLocation}
+              />
+              <p className="text-center my-2">Or</p>
+              <Button
+                onClick={getLocation}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Getting location...
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="mr-2 h-4 w-4" />
+                    {location ? "Use current location" : "Get my location"}
+                  </>
+                )}
+              </Button>
 
-            {location && (
               <div className="mt-2 rounded-md bg-muted p-3">
                 <p className="text-sm font-medium">Your coordinates:</p>
                 <p className="mt-1 font-mono text-xs">
-                  Latitude: {location.latitude.toFixed(6)}
+                  Latitude: {location ? location.latitude.toFixed(6) : "-"}
                 </p>
                 <p className="font-mono text-xs">
-                  Longitude: {location.longitude.toFixed(6)}
+                  Longitude: {location ? location.longitude.toFixed(6) : "-"}
                 </p>
               </div>
-            )}
-          </div>
+            </div>
 
-          <div className="space-y-2">
-            <p>Destination</p>
-            <CustomDropDown
-              dropDownOptions={locations}
-              selected={secondLocation}
-              setSelected={setSecondLocation}
-            />
-            <p className="text-center my-2">Or</p>
-            <form onSubmit={handleSubmitLink}>
-              <Label htmlFor="map-link">Share Google Maps Link</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="map-link"
-                  value={mapLink}
-                  onChange={(e) => setMapLink(e.target.value)}
-                  placeholder="Paste Google Maps link here"
-                  className="flex-1"
-                />
-                <Button type="submit" disabled={linkLoading || !mapLink.trim()}>
-                  {linkLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Parse"
-                  )}
-                </Button>
-              </div>
-            </form>
+            <div className="space-y-2">
+              <p>Destination</p>
+              <CustomDropDown
+                dropDownOptions={locations}
+                selected={secondLocation}
+                setSelected={setSecondLocation}
+              />
+              <p className="text-center my-2">Or</p>
+              <form onSubmit={handleSubmitLink}>
+                <Label htmlFor="map-link">Share Google Maps Link</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="map-link"
+                    value={mapLink}
+                    onChange={(e) => setMapLink(e.target.value)}
+                    placeholder="Paste Google Maps link here"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={linkLoading || !mapLink.trim()}
+                  >
+                    {linkLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Parse"
+                    )}
+                  </Button>
+                </div>
+              </form>
+              {linkError && (
+                <p className="text-xs text-destructive">{linkError}</p>
+              )}
 
-            {linkError && (
-              <p className="text-xs text-destructive">{linkError}</p>
-            )}
-
-            {secondLocation && (
               <div className="rounded-md bg-muted p-3">
                 <p className="text-sm font-medium">Destination coordinates:</p>
                 <p className="mt-1 font-mono text-xs">
-                  Latitude: {secondLocation.latitude.toFixed(6)}
+                  Latitude:{" "}
+                  {secondLocation ? secondLocation.latitude.toFixed(6) : "-"}
                 </p>
                 <p className="font-mono text-xs">
-                  Longitude: {secondLocation.longitude.toFixed(6)}
+                  Longitude:{" "}
+                  {secondLocation ? secondLocation.longitude.toFixed(6) : "-"}
                 </p>
               </div>
-            )}
+            </div>
           </div>
 
           {location && secondLocation && (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full">
               <Tabs defaultValue="road" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="road">
