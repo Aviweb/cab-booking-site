@@ -1,8 +1,16 @@
 "use client";
+import { useState } from "react";
 import LocationApp from "@/app/components/LocationApp";
 import BookingForm from "./BookingForm";
+import BookingSuccessModal from "../BookingSuccessModal";
 
 export default function BookingSection() {
+  const [showModal, setShowModal] = useState(true);
+
+  const handleBookingSuccess = () => {
+    setShowModal(true);
+  };
+
   return (
     <div className="relative isolate overflow-hidden bg-white  sm:py-2">
       <div
@@ -45,10 +53,11 @@ export default function BookingSection() {
             <LocationApp />
           </div>
           <div className="max-w-xl text-base/7 text-gray-700 lg:col-span-7">
-            <BookingForm />
+            <BookingForm onBookingSuccess={handleBookingSuccess} />
           </div>
         </div>
       </div>
+      <BookingSuccessModal showModal={showModal} setShowModal={setShowModal} />
     </div>
   );
 }

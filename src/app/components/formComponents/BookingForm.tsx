@@ -6,7 +6,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
-import BookingSuccessModal from "../BookingSuccessModal";
 import CustomDropDown from "./CustomDropDown";
 import Cookies from "universal-cookie";
 
@@ -50,7 +49,11 @@ interface FormInputs {
   mobile: string;
 }
 
-const BookingForm = () => {
+interface BookingFormProps {
+  onBookingSuccess?: () => void;
+}
+
+const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
   const {
     register,
     handleSubmit,
@@ -58,7 +61,6 @@ const BookingForm = () => {
     formState: { errors },
   } = useForm<FormInputs>();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(
     new Date()
@@ -144,13 +146,16 @@ const BookingForm = () => {
         throw new Error(data.error || "Failed to book ride");
       }
 
-      setShowModal(true);
       reset();
       setStartLoc(null);
       setEndLoc(null);
       setSelectedCar(cars[0]);
       setSelectedDateTime(new Date());
       setError(null);
+
+      if (onBookingSuccess) {
+        onBookingSuccess();
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to book ride");
       console.error("Booking Error:", error);
@@ -320,7 +325,6 @@ const BookingForm = () => {
           </div>
         </div>
       </form>
-      <BookingSuccessModal showModal={showModal} setShowModal={setShowModal} />
     </>
   );
 };
