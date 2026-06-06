@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import UserProfile from "./UserProfile";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Cookies from "universal-cookie";
+import useAuth from "@/hooks/useAuth";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -20,16 +20,10 @@ interface NavbarProps {
 const Navbar = ({ bgColor }: NavbarProps) => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [role, setRole] = useState<"driver" | "passenger" | null>(null);
-
-  useEffect(() => {
-    const cookies = new Cookies();
-    const userRole = cookies.get("role") as "driver" | "passenger" | undefined;
-    setRole(userRole || null);
-  }, []);
+  const { user, isAuthenticated } = useAuth();
 
   const NavbarData: NavbarDataProps[] =
-    role === "driver"
+    isAuthenticated && user?.role === "driver"
       ? [
           { title: "Home", section: "home", href: "/" },
           {
@@ -39,10 +33,14 @@ const Navbar = ({ bgColor }: NavbarProps) => {
           },
           { title: "My Bookings", section: "routes", href: "/my_bookings" },
         ]
-      : [
+      : isAuthenticated && user?.role === "passenger"
+      ? [
           { title: "Home", section: "home", href: "/" },
           { title: "Book Cab", section: "booking", href: "/booking_form" },
           { title: "My Bookings", section: "routes", href: "/my_bookings" },
+        ]
+      : [
+          { title: "Home", section: "home", href: "/" },
         ];
 
   return (

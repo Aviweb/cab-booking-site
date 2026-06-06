@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/shadcn/ui/button";
 import DataTable from "./ui/DataTable";
+import useAuth from "@/hooks/useAuth";
 
 interface Booking {
   id: string;
@@ -16,28 +17,70 @@ interface Booking {
   driverName?: string | null;
 }
 
+interface BookingResponse {
+  id: string;
+  car: string;
+  dateTime: string;
+  status: string;
+  passengerName: string;
+  mobile: string;
+  startLocation: string;
+  endLocation: string;
+  driverId?: string | null;
+  driverName?: string | null;
+}
+
 export default function BookingRequests() {
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPendingBookings();
-  }, []);
+    if (isAuthenticated && user?.role === "driver") {
+      fetchPendingBookings();
+    }
+  }, [isAuthenticated, user?.role]);
 
   const fetchPendingBookings = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/bookings/pending");
+      const response = await fetch("/api/bookings/pending", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Important: includes httpOnly cookies
+      });
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch bookings");
       }
 
-      setBookings(data.data || []);
+      // Map database field names to display field names
+      const statusMap: Record<string, string> = {
+        'PENDING': 'Pending',
+        'ACCEPTED': 'Accepted',
+        'REJECTED': 'Rejected',
+        'COMPLETED': 'Completed',
+        'CANCELLED': 'Cancelled'
+      };
+
+      const mappedBookings = (data.data || []).map((booking: BookingResponse) => ({
+        id: booking.id,
+        car: booking.car,
+        dateTime: booking.dateTime,
+        status: statusMap[booking.status] || 'Pending', // Convert enum to readable format
+        name: booking.passengerName, // Map passengerName to name
+        mobile: booking.mobile,
+        startLoc: booking.startLocation, // Map startLocation to startLoc
+        endLoc: booking.endLocation,     // Map endLocation to endLoc
+        driverId: booking.driverId,
+        driverName: booking.driverName,
+      }));
+
+      setBookings(mappedBookings);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch bookings");
       console.error("Error fetching bookings:", err);
@@ -57,6 +100,7 @@ export default function BookingRequests() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Important: includes httpOnly cookies
         body: JSON.stringify({ status }),
       });
 
@@ -75,11 +119,34 @@ export default function BookingRequests() {
     }
   };
 
-  if (loading) {
+  // Show loading state while authenticating or loading bookings
+  if (authLoading || loading) {
     return (
       <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
         <div className="bg-white p-8 border rounded-lg text-center">
-          <p className="text-gray-600">Loading bookings...</p>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Please log in as a driver to view booking requests.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not a driver
+  if (user?.role !== "driver") {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Only drivers can view booking requests.</p>
         </div>
       </div>
     );

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -24,14 +24,14 @@ enum CarType {
 }
 
 model drivers {
-  id         String     @id @default(uuid()) @db.VarChar(36)
-  name       String     @db.VarChar(100)
-  email      String     @unique @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  phone      String?    @db.VarChar(15)
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
   isActive   Boolean    @default(true)
-  created_at DateTime   @default(now()) @db.Timestamp(0)
-  updated_at DateTime   @updatedAt @db.Timestamp(0)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
   bookings   bookings[] @relation("DriverBookings")
 
   @@index([email])
@@ -40,14 +40,14 @@ model drivers {
 }
 
 model passengers {
-  id         String     @id @default(uuid()) @db.VarChar(36)
-  name       String     @db.VarChar(100)
-  email      String     @unique @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  phone      String?    @db.VarChar(15)
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
   isActive   Boolean    @default(true)
-  created_at DateTime   @default(now()) @db.Timestamp(0)
-  updated_at DateTime   @updatedAt @db.Timestamp(0)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
   bookings   bookings[] @relation("PassengerBookings")
 
   @@index([email])
@@ -56,32 +56,32 @@ model passengers {
 }
 
 model bookings {
-  id                String        @id @default(uuid()) @db.VarChar(36)
+  id                String        @id @default(uuid())
   car               CarType
-  dateTime          DateTime      @db.DateTime(0)
-  startLocation     String        @db.VarChar(500)
-  endLocation       String        @db.VarChar(500)
-  startLatitude     Decimal?      @db.Decimal(10, 8)
-  startLongitude    Decimal?      @db.Decimal(11, 8)
-  endLatitude       Decimal?      @db.Decimal(10, 8)
-  endLongitude      Decimal?      @db.Decimal(11, 8)
-  estimatedDistance Float?        @db.Float
-  estimatedFare     Decimal?      @db.Decimal(8, 2)
-  actualFare        Decimal?      @db.Decimal(8, 2)
-  mobile            String        @db.VarChar(15)
-  passengerName     String        @db.VarChar(100)
-  specialRequests   String?       @db.Text
+  dateTime          DateTime
+  startLocation     String
+  endLocation       String
+  startLatitude     Float?
+  startLongitude    Float?
+  endLatitude       Float?
+  endLongitude      Float?
+  estimatedDistance Float?
+  estimatedFare     Float?
+  actualFare        Float?
+  mobile            String
+  passengerName     String
+  specialRequests   String?
   status            BookingStatus @default(PENDING)
-  created_at        DateTime      @default(now()) @db.Timestamp(0)
-  updated_at        DateTime      @updatedAt @db.Timestamp(0)
-  acceptedAt        DateTime?     @db.Timestamp(0)
-  completedAt       DateTime?     @db.Timestamp(0)
-  cancelledAt       DateTime?     @db.Timestamp(0)
-  cancellationNote  String?       @db.Text
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  acceptedAt        DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationNote  String?
 
   // Foreign Keys
-  passengerId       String        @db.VarChar(36)
-  driverId          String?       @db.VarChar(36)
+  passengerId       String
+  driverId          String?
 
   // Relationships
   passenger         passengers    @relation("PassengerBookings", fields: [passengerId], references: [id], onDelete: Cascade)

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
 import CustomDropDown from "./CustomDropDown";
-import Cookies from "universal-cookie";
+import useAuth from "@/hooks/useAuth";
 
 interface Location {
   id: number;
@@ -60,6 +60,7 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
     reset,
     formState: { errors },
   } = useForm<FormInputs>();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(
@@ -68,13 +69,6 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
   const [startLoc, setStartLoc] = useState<Location | null>(null);
   const [endLoc, setEndLoc] = useState<Location | null>(null);
   const [selectedCar, setSelectedCar] = useState<Car>(cars[0]);
-  const [userId, setUserId] = useState<string | undefined>();
-
-  useEffect(() => {
-    const cookies = new Cookies();
-    const uuid = cookies.get("uuid");
-    setUserId(uuid);
-  }, []);
 
   const validateMobile = (mobile: string): boolean => {
     const mobileRegex = /^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$/;
@@ -114,7 +108,7 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
       return;
     }
 
-    if (!userId) {
+    if (!isAuthenticated || !user?.userId) {
       setError("You must be logged in to book a ride");
       return;
     }
@@ -128,7 +122,7 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
       startLoc: startLoc.name,
       endLoc: endLoc.name,
       dateTime: selectedDateTime.toISOString(),
-      userId: userId,
+      userId: user.userId,
     };
 
     try {
@@ -137,6 +131,7 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Important: includes httpOnly cookies
         body: JSON.stringify(payload),
       });
 
@@ -163,6 +158,47 @@ const BookingForm = ({ onBookingSuccess }: BookingFormProps) => {
       setLoading(false);
     }
   };
+
+  // Show loading state while authenticating
+  if (authLoading) {
+    return (
+      <div className="h-screen max-w-2xl mx-auto lg:mt-4 flex items-center justify-center">
+        <div className="p-8 border rounded-lg bg-white text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen max-w-2xl mx-auto lg:mt-4 flex items-center justify-center">
+        <div className="p-8 border rounded-lg bg-white text-center">
+          <h2 className="text-xl font-semibold mb-4">Login Required</h2>
+          <p className="text-gray-600 mb-4">Please log in as a passenger to book a ride.</p>
+          <a 
+            href="/passenger_login" 
+            className="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500"
+          >
+            Login as Passenger
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show form to passengers
+  if (user?.role !== "passenger") {
+    return (
+      <div className="h-screen max-w-2xl mx-auto lg:mt-4 flex items-center justify-center">
+        <div className="p-8 border rounded-lg bg-white text-center">
+          <h2 className="text-xl font-semibold mb-4">Access Denied</h2>
+          <p className="text-gray-600">Only passengers can book rides.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

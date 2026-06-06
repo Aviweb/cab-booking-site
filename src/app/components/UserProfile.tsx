@@ -9,26 +9,35 @@ import {
   NavigationMenuTrigger,
 } from "../../components/shadcn/ui/navigation-menu";
 import { User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/shadcn/ui/button";
 import Link from "next/link";
-import Cookies from "universal-cookie";
+import useAuth from "@/hooks/useAuth";
 
 export function UserProfile() {
-  const [userLoggedin, setUserLoggedIn] = useState(false);
-  useEffect(() => {
-    const cookies = new Cookies();
-    const uuid = cookies.get("uuid");
-    if (uuid) setUserLoggedIn(true);
-  }, []);
+  const { user, isAuthenticated } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const clearCookies = () => {
-    const cookies = document.cookie.split(";");
-    cookies.forEach((cookie) => {
-      const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
-    });
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      
+      // Call logout API to clear httpOnly cookie
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      // Redirect to home regardless of API response
+      // The httpOnly cookie will be cleared by the server
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Still redirect even if logout API fails
+      window.location.href = "/";
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
   return (
     <NavigationMenu className="lg:translate-x-10">
@@ -40,15 +49,23 @@ export function UserProfile() {
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            {userLoggedin ? (
-              <Button
-                onClick={() => {
-                  clearCookies();
-                  window.location.href = "/";
-                }}
-              >
-                Logout
-              </Button>
+            {isAuthenticated ? (
+              <div className="p-4 min-w-[200px]">
+                {user && (
+                  <div className="mb-4">
+                    <p className="font-medium">{user.name}</p>
+                    <p className="text-sm text-gray-600 capitalize">{user.role}</p>
+                  </div>
+                )}
+                <Button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {isLoggingOut ? "Logging out..." : "Logout"}
+                </Button>
+              </div>
             ) : (
               <ul className="flex p-4 lg:w-[300px] space-x-3  lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3 rounded-lg w-[180px] bg-[#FCD172] ">

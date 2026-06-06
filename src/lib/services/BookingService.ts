@@ -71,7 +71,7 @@ export class BookingService {
     const booking = await this.bookingRepository.findById(bookingId);
 
     if (
-      booking.status !== "Pending" &&
+      booking.status !== "PENDING" &&
       (status === "Accepted" || status === "Rejected")
     ) {
       throw new ValidationError(
@@ -104,7 +104,7 @@ export class BookingService {
   async cancelBooking(bookingId: string, userId: string, role: string) {
     const booking = await this.bookingRepository.findById(bookingId);
 
-    if (role === "passenger" && booking.userId !== userId) {
+    if (role === "passenger" && booking.passengerId !== userId) {
       throw new AuthorizationError("You can only cancel your own bookings");
     }
 
@@ -114,7 +114,7 @@ export class BookingService {
       );
     }
 
-    if (booking.status === "Completed") {
+    if (booking.status === "COMPLETED") {
       throw new ValidationError("Cannot cancel completed bookings");
     }
 

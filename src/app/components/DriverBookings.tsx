@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
 import DataTable from "./ui/DataTable";
+import useAuth from "@/hooks/useAuth";
 
 interface BookingEntry {
   car: string;
@@ -14,23 +14,25 @@ interface BackendData {
   car?: string;
   dateTime?: string;
   status?: string;
-  name?: string;
+  passengerName?: string;
   mobile?: string;
   id: string;
+  startLocation?: string;
+  endLocation?: string;
 }
 
 export default function DriverBookings() {
-  const cookies = new Cookies();
-  const uuid = cookies.get("uuid");
-  const role = cookies.get("role");
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [bookingData, setBookingData] = useState<BookingEntry[]>([]);
+  
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetching data", user?.userId, user?.role);
       try {
-        if (!uuid || !role) return;
+        if (!isAuthenticated || !user?.userId || !user?.role) return;
 
         const response = await fetch(
-          `/api/bookings?uuid=${uuid}&role=${role}`,
+          `/api/bookings`, // No query params needed - uses authentication middleware
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -47,11 +49,20 @@ export default function DriverBookings() {
         const bookings = res.data || [];
 
         const filteredData = bookings.map((item: BackendData) => {
+          // Convert enum status to readable format
+          const statusMap: Record<string, string> = {
+            'PENDING': 'Pending',
+            'ACCEPTED': 'Accepted',
+            'REJECTED': 'Rejected',
+            'COMPLETED': 'Completed',
+            'CANCELLED': 'Cancelled'
+          };
+
           return {
             car: item?.car || "",
             journeyDate: item?.dateTime || "",
-            status: item?.status || "Pending",
-            name: item?.name || "",
+            status: statusMap[item?.status || 'PENDING'] || 'Pending',
+            name: item?.passengerName || "", // Use correct field name
             mobile: item?.mobile || "",
             id: item?.id,
           } as BookingEntry;
@@ -65,7 +76,29 @@ export default function DriverBookings() {
     };
 
     fetchData();
-  }, [uuid, role]);
+  }, [user?.userId, user?.role, isAuthenticated]);
+
+  // Show loading state while authenticating
+  if (authLoading) {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Please log in to view your bookings.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6  mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
