@@ -1,20 +1,19 @@
 /**
- * Environment variable validation
- * Implements configuration pattern
+ * Environment configuration (Legacy)
+ * @deprecated Use ConfigurationService instead for new code
  */
 
-function getEnvVar(key: string, defaultValue?: string): string {
+// Re-export from the new configuration service for backward compatibility
+export { env, configService } from "@/lib/config/ConfigurationService";
+
+/**
+ * @deprecated Use configService.get() instead
+ */
+export function getEnvVar(key: string, defaultValue?: string): string {
+  console.warn(`getEnvVar is deprecated. Use configService.get("${key}") instead`);
   const value = process.env[key] || defaultValue;
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
   return value;
 }
-
-export const env = {
-  DATABASE_URL: getEnvVar("DATABASE_URL"),
-  JWT_SECRET: getEnvVar("JWT_SECRET"),
-  NODE_ENV: process.env.NODE_ENV || "development",
-  IS_PRODUCTION: process.env.NODE_ENV === "production",
-  IS_DEVELOPMENT: process.env.NODE_ENV === "development",
-} as const;

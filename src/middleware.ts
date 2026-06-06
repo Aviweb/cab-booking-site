@@ -30,13 +30,13 @@ export async function middleware(req: NextRequest) {
   const token = tokenCookie?.value;
 
   if (!token || token.trim() === "") {
-    return NextResponse.redirect(new URL("/plogin", req.url));
+    return NextResponse.redirect(new URL("/passenger_login", req.url));
   }
 
   const decoded = await verifyJWT(token);
 
   if (!decoded || !decoded.role) {
-    return NextResponse.redirect(new URL("/plogin", req.url));
+    return NextResponse.redirect(new URL("/passenger_login", req.url));
   }
 
   const role = decoded.role as string;
