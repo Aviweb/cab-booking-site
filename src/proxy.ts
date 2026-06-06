@@ -25,7 +25,7 @@ async function verifyJWT(token: string) {
   }
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const tokenCookie = req.cookies.get("token");
   const token = tokenCookie?.value;
 
