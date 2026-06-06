@@ -1,13 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import UserProfile from "./UserProfile";
-import ThemeToggle from "./ThemeToggle";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Cookies from "universal-cookie";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Car } from "lucide-react";
 
 interface NavbarDataProps {
   title: string;
@@ -23,19 +21,11 @@ const Navbar = ({ bgColor }: NavbarProps) => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [role, setRole] = useState<"driver" | "passenger" | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const cookies = new Cookies();
     const userRole = cookies.get("role") as "driver" | "passenger" | undefined;
     setRole(userRole || null);
-
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const NavbarData: NavbarDataProps[] =
@@ -56,105 +46,88 @@ const Navbar = ({ bgColor }: NavbarProps) => {
         ];
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled || bgColor
-          ? "glass-effect shadow-lg"
-          : "bg-transparent"
-      } px-4 lg:px-16 xl:px-24 2xl:px-32`}
+    <div
+      className={`px-4 lg:px-[100px] w-full flex justify-between items-center ${
+        bgColor ? bgColor : "bg-transparent"
+      } z-50`}
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center h-20">
-          
-          {/* Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => router.push("/")}>
-            <div className="flex items-center justify-center w-10 h-10 gradient-primary rounded-xl">
-              <Car className="w-6 h-6 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <span className="text-xl font-bold gradient-text">CabInsta</span>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-2">
-            {NavbarData.map((navItem, index) => (
+      <div className="flex justify-between">
+        <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen}>
+          <div className="fixed inset-0 z-50" />
+          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+            <div className="flex items-center justify-between">
+              <a href="#" className="-m-1.5 p-1.5">
+                <span className="sr-only">Your Company</span>
+              </a>
               <button
-                key={index}
-                className="px-6 py-2 font-medium text-secondary-700 hover:text-primary-600 hover:bg-white/50 rounded-xl transition-all duration-200"
-                onClick={() => router.push(navItem.href)}
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="-m-2.5 rounded-md p-2.5 text-gray-700"
               >
-                {navItem.title}
+                <span className="sr-only">Close menu</span>
+                <XMarkIcon aria-hidden="true" className="size-6" />
               </button>
-            ))}
-          </div>
+            </div>
+            <div className="mt-6 flow-root">
+              <div className="-my-6 divide-y divide-gray-500/10">
+                <div className="space-y-2 py-6">
+                  {NavbarData.map((item) => (
+                    <a
+                      key={item.section}
+                      href={item.href}
+                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+                </div>
+                <div className="py-6">
+                  <a
+                    href="#"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                  >
+                    Log in
+                  </a>
+                </div>
+              </div>
+            </div>
+          </DialogPanel>
+        </Dialog>
 
-          {/* Right Side */}
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            <UserProfile />
-            
-            {/* Mobile Menu Button */}
+        <div className="flex lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+          >
+            <span className="sr-only">Open main menu</span>
+            <Bars3Icon aria-hidden="true" className="size-6" />
+          </button>
+        </div>
+        <Image
+          src="/img/logo.png"
+          className="w-[160px] h-[100px] hidden lg:flex"
+          alt="image"
+          width={160}
+          height={100}
+        />
+        <div className="hidden lg:flex">
+          {NavbarData.map((navItem, index) => (
             <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-xl hover:bg-white/50 dark:hover:bg-secondary-800/50 transition-colors"
+              key={index}
+              className="py-3 inline-block px-6 font-bold hover:bg-gray-100 text-[#262626]"
+              onClick={() => router.push(navItem.href)}
             >
-              <span className="sr-only">Open menu</span>
-              <Bars3Icon className="w-6 h-6 text-secondary-700 dark:text-secondary-300" />
+              {navItem.title}
             </button>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Mobile Menu Dialog */}
-      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen}>
-        <div className="fixed inset-0 z-50" />
-        <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white/95 backdrop-blur-lg px-6 py-6 sm:max-w-sm border-l border-gray-200">
-          
-          {/* Mobile Menu Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 gradient-primary rounded-xl">
-                <Car className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold gradient-text">CabInsta</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-            >
-              <span className="sr-only">Close menu</span>
-              <XMarkIcon className="w-6 h-6 text-secondary-700" />
-            </button>
-          </div>
-
-          {/* Mobile Menu Items */}
-          <div className="space-y-4">
-            {NavbarData.map((item, index) => (
-              <button
-                key={item.section}
-                onClick={() => {
-                  router.push(item.href);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-4 py-3 rounded-xl text-lg font-medium text-secondary-900 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200"
-              >
-                {item.title}
-              </button>
-            ))}
-          </div>
-
-          {/* Mobile Menu Footer */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="text-sm text-secondary-600 text-center">
-              © 2024 CabInsta. All rights reserved.
-            </div>
-          </div>
-        </DialogPanel>
-      </Dialog>
-    </nav>
+      <div className="flex items-center">
+        <UserProfile />
+      </div>
+    </div>
   );
 };
 

@@ -3,7 +3,6 @@ import { useState } from "react";
 import LocationApp from "@/app/components/LocationApp";
 import BookingForm from "./BookingForm";
 import BookingSuccessModal from "../BookingSuccessModal";
-import { MapPin, Clock } from "lucide-react";
 
 export default function BookingSection() {
   const [showModal, setShowModal] = useState(false);
@@ -13,77 +12,52 @@ export default function BookingSection() {
   };
 
   return (
-    <section id="booking" className="py-20 bg-gradient-to-br from-white to-blue-50 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-100 to-accent-100 rounded-full blur-3xl opacity-20 -translate-y-48 -translate-x-48" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-br from-accent-100 to-warning-100 rounded-full blur-3xl opacity-20 translate-y-48 translate-x-48" />
-      
-      <div className="max-w-7xl mx-auto px-4 lg:px-16 xl:px-24 2xl:px-32">
-        
-        {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
-          <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full mb-6">
-            <MapPin className="w-4 h-4" />
-            <span className="font-semibold text-sm">Quick Booking</span>
+    <div className="relative isolate overflow-hidden bg-white  sm:py-2">
+      <div
+        aria-hidden="true"
+        className="absolute -top-80 left-[max(6rem,33%)] -z-10 transform-gpu blur-3xl sm:left-1/2 md:top-20 lg:ml-20 xl:top-3 xl:ml-56"
+      >
+        <div
+          style={{
+            clipPath:
+              "polygon(63.1% 29.6%, 100% 17.2%, 76.7% 3.1%, 48.4% 0.1%, 44.6% 4.8%, 54.5% 25.4%, 59.8% 49.1%, 55.3% 57.9%, 44.5% 57.3%, 27.8% 48%, 35.1% 81.6%, 0% 97.8%, 39.3% 100%, 35.3% 81.5%, 97.2% 52.8%, 63.1% 29.6%)",
+          }}
+          className="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
+        />
+      </div>
+      <div className="w-full px-4 lg:pl-[124px] lg:pr-[80px]  2xl:w-[1245px] 2xl:mx-auto 2xl:px-0 translate-y-10">
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:mx-0 lg:mt-0 lg:max-w-none lg:grid-cols-12">
+          <div className="relative lg:order-last lg:col-span-5">
+            <svg
+              aria-hidden="true"
+              className="absolute -top-[40rem] left-1 -z-10 h-[64rem] w-[175.5rem] -translate-x-1/2 stroke-gray-900/10 [mask-image:radial-gradient(64rem_64rem_at_111.5rem_0%,white,transparent)]"
+            >
+              <defs>
+                <pattern
+                  id="e87443c8-56e4-4c20-9111-55b82fa704e3"
+                  width={200}
+                  height={200}
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path d="M0.5 0V200M200 0.5L0 0.499983" />
+                </pattern>
+              </defs>
+              <rect
+                fill="url(#e87443c8-56e4-4c20-9111-55b82fa704e3)"
+                width="100%"
+                height="100%"
+                strokeWidth={0}
+              />
+            </svg>
+            {/* Right Part */}
+            <LocationApp />
           </div>
-          
-          <h2 className="text-4xl md:text-5xl font-bold text-secondary-900 mb-6">
-            Book Your{" "}
-            <span className="gradient-text">Perfect Ride</span>
-          </h2>
-          
-          <p className="text-xl text-secondary-600 max-w-2xl mx-auto leading-relaxed">
-            Get instant fare estimates and book your cab in just a few clicks. 
-            Professional drivers, premium vehicles, unbeatable prices.
-          </p>
-        </div>
-
-        {/* Booking Interface */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          
-          {/* Left Side - Booking Form */}
-          <div className="order-2 lg:order-1">
-            <div className="card-modern p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-secondary-900">Quick Booking</h3>
-                  <p className="text-secondary-600">Fill details and get instant quote</p>
-                </div>
-              </div>
-              
-              <BookingForm onBookingSuccess={handleBookingSuccess} />
-            </div>
+          <div className="max-w-xl text-base/7 text-gray-700 lg:col-span-7">
+            <BookingForm onBookingSuccess={handleBookingSuccess} />
           </div>
-
-          {/* Right Side - Location/Map */}
-          <div className="order-1 lg:order-2">
-            <div className="card-modern overflow-hidden">
-              <LocationApp mode="homescreen" />
-            </div>
-          </div>
-        </div>
-
-        {/* Features Strip */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { icon: "🚗", title: "Instant Booking", desc: "Book in 30 seconds" },
-            { icon: "📱", title: "Live Tracking", desc: "Track your ride" },
-            { icon: "💳", title: "Cashless Payment", desc: "Multiple options" },
-            { icon: "🛡️", title: "Safe & Secure", desc: "Verified drivers" },
-          ].map((feature, index) => (
-            <div key={index} className="text-center p-4 rounded-xl bg-white/50 hover:bg-white/80 transition-all duration-300">
-              <div className="text-3xl mb-2">{feature.icon}</div>
-              <h4 className="font-semibold text-secondary-900 text-sm">{feature.title}</h4>
-              <p className="text-xs text-secondary-600">{feature.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
-
       <BookingSuccessModal showModal={showModal} setShowModal={setShowModal} />
-    </section>
+    </div>
   );
 }
