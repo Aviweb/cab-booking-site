@@ -4,7 +4,6 @@
  * Replaces client-side cookie reading for security
  */
 
-import { NextRequest } from "next/server";
 import { successResponse } from "@/lib/utils/response";
 import { withAuth, ApiRequest } from "@/lib/middleware/apiAuth";
 import { serviceFactory } from "@/lib/factories/ServiceFactory";

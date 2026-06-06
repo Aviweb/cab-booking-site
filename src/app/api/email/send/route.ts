@@ -3,7 +3,6 @@
  * Handles sending emails via EmailService - restricted to authenticated users
  */
 
-import { NextRequest } from "next/server";
 import { handleApiRequest, successResponse } from "@/lib/utils/response";
 import { withAuth, withRateLimit, ApiRequest } from "@/lib/middleware/apiAuth";
 import { serviceFactory } from "@/lib/factories/ServiceFactory";

@@ -4,7 +4,7 @@
  */
 
 import { handleApiRequest, createdResponse } from "@/lib/utils/response";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ValidationError } from "@/lib/errors";
 import { withAuth, withRateLimit, ApiRequest } from "@/lib/middleware/apiAuth";
 import { serviceFactory } from "@/lib/factories/ServiceFactory";

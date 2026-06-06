@@ -5,6 +5,7 @@
 
 import prisma from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
+import { CarType, BookingStatus } from "@prisma/client";
 
 export interface CreateBookingData {
   car: string;
@@ -20,34 +21,34 @@ export interface CreateBookingData {
 }
 
 export interface UpdateBookingData {
-  driverId?: string;
-  driverName?: string;
+  driverId?: string | null;
+  driverName?: string | null;
   status?: string;
 }
 
 export class BookingRepository {
   async create(data: CreateBookingData) {
     // Map car string to CarType enum
-    const carTypeMap: Record<string, string> = {
-      'Swift': 'SWIFT',
-      'Etios': 'ETIOS', 
-      'Ertiga': 'ERTIGA',
-      'Innova': 'INNOVA',
-      'Traveller': 'TRAVELLER'
+    const carTypeMap: Record<string, CarType> = {
+      'Swift': CarType.SWIFT,
+      'Etios': CarType.ETIOS, 
+      'Ertiga': CarType.ERTIGA,
+      'Innova': CarType.INNOVA,
+      'Traveller': CarType.TRAVELLER
     };
 
     // Map status to BookingStatus enum
-    const statusMap: Record<string, string> = {
-      'Pending': 'PENDING',
-      'Accepted': 'ACCEPTED',
-      'Rejected': 'REJECTED',
-      'Completed': 'COMPLETED',
-      'Cancelled': 'CANCELLED'
+    const statusMap: Record<string, BookingStatus> = {
+      'Pending': BookingStatus.PENDING,
+      'Accepted': BookingStatus.ACCEPTED,
+      'Rejected': BookingStatus.REJECTED,
+      'Completed': BookingStatus.COMPLETED,
+      'Cancelled': BookingStatus.CANCELLED
     };
 
     return await prisma.bookings.create({
       data: {
-        car: carTypeMap[data.car] || 'SWIFT', // Use mapped enum value
+        car: carTypeMap[data.car] || CarType.SWIFT, // Use mapped enum value
         dateTime: data.dateTime,
         startLocation: data.startLoc, // Schema uses startLocation
         endLocation: data.endLoc,     // Schema uses endLocation
@@ -55,7 +56,7 @@ export class BookingRepository {
         passengerName: data.name,     // Schema uses passengerName
         passengerId: data.userId,     // Schema uses passengerId for passengers
         driverId: data.driverId || null,
-        status: statusMap[data.status || 'Pending'] || 'PENDING', // Use mapped enum value
+        status: statusMap[data.status || 'Pending'] || BookingStatus.PENDING, // Use mapped enum value
       },
     });
   }
@@ -86,24 +87,32 @@ export class BookingRepository {
 
   async findPending() {
     return await prisma.bookings.findMany({
-      where: { status: "PENDING" }, // Use enum value from schema
+      where: { status: BookingStatus.PENDING }, // Use enum value from schema
       orderBy: { created_at: "desc" },
     });
   }
 
   async update(id: string, data: UpdateBookingData) {
     // Map status to BookingStatus enum if status is provided
-    const statusMap: Record<string, string> = {
-      'Pending': 'PENDING',
-      'Accepted': 'ACCEPTED',
-      'Rejected': 'REJECTED',
-      'Completed': 'COMPLETED',
-      'Cancelled': 'CANCELLED'
+    const statusMap: Record<string, BookingStatus> = {
+      'Pending': BookingStatus.PENDING,
+      'Accepted': BookingStatus.ACCEPTED,
+      'Rejected': BookingStatus.REJECTED,
+      'Completed': BookingStatus.COMPLETED,
+      'Cancelled': BookingStatus.CANCELLED
     };
 
-    const updateData = { ...data };
-    if (updateData.status) {
-      updateData.status = statusMap[updateData.status] || updateData.status;
+    const updateData: {
+      driverId?: string | null;
+      driverName?: string | null;
+      status?: BookingStatus;
+    } = {
+      ...(data.driverId !== undefined && { driverId: data.driverId }),
+      ...(data.driverName !== undefined && { driverName: data.driverName }),
+    };
+
+    if (data.status) {
+      updateData.status = statusMap[data.status] || BookingStatus.PENDING;
     }
 
     return await prisma.bookings.update({

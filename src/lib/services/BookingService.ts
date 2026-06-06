@@ -10,6 +10,7 @@ import {
 } from "@/lib/repositories/BookingRepository";
 import { ValidationError, AuthorizationError } from "@/lib/errors";
 import { Validator } from "@/lib/validation";
+import { BookingStatus } from "@prisma/client";
 
 export class BookingService {
   private bookingRepository: BookingRepository;
@@ -71,7 +72,7 @@ export class BookingService {
     const booking = await this.bookingRepository.findById(bookingId);
 
     if (
-      booking.status !== "PENDING" &&
+      booking.status !== BookingStatus.PENDING &&
       (status === "Accepted" || status === "Rejected")
     ) {
       throw new ValidationError(
@@ -114,7 +115,7 @@ export class BookingService {
       );
     }
 
-    if (booking.status === "COMPLETED") {
+    if (booking.status === BookingStatus.COMPLETED) {
       throw new ValidationError("Cannot cancel completed bookings");
     }
 

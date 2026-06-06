@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/services/LoggingService";
 import { configService } from "@/lib/config/ConfigurationService";
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     logger.logApiRequest("POST", "/api/auth/logout");
 

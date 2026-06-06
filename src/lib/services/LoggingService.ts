@@ -7,7 +7,7 @@ export interface LogEntry {
   level: "debug" | "info" | "warn" | "error";
   message: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   source?: string;
 }
 
@@ -119,7 +119,7 @@ class LoggingService {
     }
   }
 
-  private log(level: LogEntry["level"], message: string, metadata?: Record<string, any>, source?: string): void {
+  private log(level: LogEntry["level"], message: string, metadata?: Record<string, unknown>, source?: string): void {
     const entry: LogEntry = {
       level,
       message,
@@ -138,24 +138,24 @@ class LoggingService {
     });
   }
 
-  debug(message: string, metadata?: Record<string, any>, source?: string): void {
+  debug(message: string, metadata?: Record<string, unknown>, source?: string): void {
     this.log("debug", message, metadata, source);
   }
 
-  info(message: string, metadata?: Record<string, any>, source?: string): void {
+  info(message: string, metadata?: Record<string, unknown>, source?: string): void {
     this.log("info", message, metadata, source);
   }
 
-  warn(message: string, metadata?: Record<string, any>, source?: string): void {
+  warn(message: string, metadata?: Record<string, unknown>, source?: string): void {
     this.log("warn", message, metadata, source);
   }
 
-  error(message: string, metadata?: Record<string, any>, source?: string): void {
+  error(message: string, metadata?: Record<string, unknown>, source?: string): void {
     this.log("error", message, metadata, source);
   }
 
   // Convenience methods for common patterns
-  logApiRequest(method: string, path: string, userId?: string, metadata?: Record<string, any>): void {
+  logApiRequest(method: string, path: string, userId?: string, metadata?: Record<string, unknown>): void {
     this.info(`${method} ${path}`, { userId, ...metadata }, "API");
   }
 
@@ -167,11 +167,11 @@ class LoggingService {
     }, "API");
   }
 
-  logAuthEvent(event: string, userId?: string, metadata?: Record<string, any>): void {
+  logAuthEvent(event: string, userId?: string, metadata?: Record<string, unknown>): void {
     this.info(`Auth: ${event}`, { userId, ...metadata }, "AUTH");
   }
 
-  logBusinessEvent(event: string, metadata?: Record<string, any>): void {
+  logBusinessEvent(event: string, metadata?: Record<string, unknown>): void {
     this.info(`Business: ${event}`, metadata, "BUSINESS");
   }
 }
