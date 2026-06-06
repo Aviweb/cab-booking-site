@@ -66,7 +66,7 @@ export const RegisterForm = ({ setFormState, role }: Props) => {
       };
 
       const apiEndpoint =
-        role === "driver" ? "/api/dregister" : "/api/pregister";
+        role === "driver" ? "/api/auth/driver/register" : "/api/auth/passenger/register";
       const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

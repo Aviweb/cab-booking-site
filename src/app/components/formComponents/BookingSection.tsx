@@ -5,7 +5,7 @@ import BookingForm from "./BookingForm";
 import BookingSuccessModal from "../BookingSuccessModal";
 
 export default function BookingSection() {
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   const handleBookingSuccess = () => {
     setShowModal(true);

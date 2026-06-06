@@ -54,7 +54,7 @@ export function UserProfile() {
                 <li className="row-span-3 rounded-lg w-[180px] bg-[#FCD172] ">
                   <Link
                     className="flex h-full w-full select-none flex-col items-center justify-between rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/plogin"
+                    href="/passenger_login"
                   >
                     <User className="h-6 w-6" />
                     <p className="mb-2 mt-4 text-lg font-medium">Passenger</p>
@@ -66,7 +66,7 @@ export function UserProfile() {
                 <li className="row-span-3 rounded-lg w-[180px] bg-mustard-500">
                   <a
                     className="flex h-full w-full select-none flex-col  rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/dlogin"
+                    href="/driver_login"
                   >
                     <User className="h-6 w-6 ml-6" />
                     <p className="mb-2 mt-4 text-lg font-medium ">Driver</p>

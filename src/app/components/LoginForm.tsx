@@ -36,7 +36,7 @@ export const LoginForm = ({ setFormState, role }: props) => {
         password: pass,
       };
 
-      const apiEndpoint = role === "driver" ? "/api/dlogin" : "/api/plogin";
+      const apiEndpoint = role === "driver" ? "/api/auth/driver/login" : "/api/auth/passenger/login";
       const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
