@@ -18,13 +18,11 @@ export async function PATCH(
     const body = await req.json();
     const { status } = body;
 
-    // Get token from cookies
     const token = req.cookies.get("token")?.value;
     if (!token) {
       throw new Error("Unauthorized");
     }
 
-    // Verify token
     const secretKey = new TextEncoder().encode(env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secretKey);
     const userId = payload.userId as string;
@@ -36,7 +34,6 @@ export async function PATCH(
 
     const bookingService = new BookingService();
 
-    // Fetch user name from database if needed
     let userName = "Driver";
     if (role === "driver") {
       const { UserRepository } = await import(
@@ -46,14 +43,10 @@ export async function PATCH(
       try {
         const driver = await userRepo.findDriverById(userId);
         userName = driver.name;
-      } catch {
-        // Use default if fetch fails
-      }
+      } catch {}
     }
 
-    // Handle different status updates
     if (status === "Accepted" || status === "Rejected") {
-      // Driver accepting/rejecting booking
       if (role !== "driver") {
         throw new Error("Only drivers can accept or reject bookings");
       }

@@ -46,7 +46,6 @@ export class UserRepository {
   }
 
   async createPassenger(data: CreateUserData) {
-    // Check if email already exists
     const existing = await this.findPassengerByEmail(data.email);
     if (existing) {
       throw new ConflictError("Passenger with this email already exists");
@@ -64,7 +63,6 @@ export class UserRepository {
   }
 
   async createDriver(data: CreateUserData) {
-    // Check if email already exists
     const existing = await this.findDriverByEmail(data.email);
     if (existing) {
       throw new ConflictError("Driver with this email already exists");

@@ -3,45 +3,95 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum CarType {
+  SWIFT
+  ETIOS
+  ERTIGA
+  INNOVA
+  TRAVELLER
+}
+
 model drivers {
-  id         String     @id @unique(map: "id") @db.VarChar(255)
-  name       String     @db.VarChar(255)
-  email      String     @unique(map: "email") @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  created_at DateTime?  @default(now()) @db.Timestamp(0)
-  bookings   bookings[] // One-to-many relationship with bookings
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
+  isActive   Boolean    @default(true)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  bookings   bookings[] @relation("DriverBookings")
+
+  @@index([email])
+  @@index([isActive])
+  @@map("drivers")
 }
 
 model passengers {
-  id         String     @id @unique(map: "id") @db.VarChar(255)
-  name       String     @db.VarChar(255)
-  email      String     @unique(map: "email") @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  created_at DateTime?  @default(now()) @db.Timestamp(0)
-  bookings   bookings[] // One-to-many relationship with bookings
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  phone      String?
+  isActive   Boolean    @default(true)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  bookings   bookings[] @relation("PassengerBookings")
+
+  @@index([email])
+  @@index([isActive])
+  @@map("passengers")
 }
 
 model bookings {
-  id         String      @id @db.VarChar(36)
-  car        String      @db.VarChar(255)
-  dateTime   DateTime    @db.DateTime(0)
-  startLoc   String      @db.VarChar(255)
-  endLoc     String      @db.VarChar(255)
-  mobile     String      @db.VarChar(20)
-  name       String      @db.VarChar(255)
-  driverId   String?     @db.VarChar(36)
-  driverName String?     @db.VarChar(255)
-  status     String?     @db.VarChar(50)
-  created_at DateTime?   @default(now()) @db.Timestamp(0)
-  userId     String?     @db.VarChar(36)
-  
+  id                String        @id @default(uuid())
+  car               CarType
+  dateTime          DateTime
+  startLocation     String
+  endLocation       String
+  startLatitude     Float?
+  startLongitude    Float?
+  endLatitude       Float?
+  endLongitude      Float?
+  estimatedDistance Float?
+  estimatedFare     Float?
+  actualFare        Float?
+  mobile            String
+  passengerName     String
+  specialRequests   String?
+  status            BookingStatus @default(PENDING)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  acceptedAt        DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationNote  String?
+
+  // Foreign Keys
+  passengerId       String
+  driverId          String?
+
   // Relationships
-  // Note: These relationships are defined but foreign key constraints may not exist in the database
-  // Run `npx prisma migrate dev` to add foreign key constraints if needed
-  driver     drivers?    @relation(fields: [driverId], references: [id], onDelete: SetNull, map: "driverId")
-  passenger  passengers? @relation(fields: [userId], references: [id], onDelete: SetNull, map: "userId")
+  passenger         passengers    @relation("PassengerBookings", fields: [passengerId], references: [id], onDelete: Cascade)
+  driver            drivers?      @relation("DriverBookings", fields: [driverId], references: [id], onDelete: SetNull)
+
+  @@index([passengerId])
+  @@index([driverId])
+  @@index([status])
+  @@index([dateTime])
+  @@index([created_at])
+  @@index([status, dateTime])
+  @@map("bookings")
 }

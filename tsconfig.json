@@ -28,7 +28,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/lib/prisma.js",
-    "src/app/api/dlogin/route.js"
+    "src/app/api/driver_login/route.js"
   ],
   "exclude": ["node_modules"]
 }

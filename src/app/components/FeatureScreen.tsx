@@ -19,7 +19,6 @@ const FeatureScreen = () => {
                 src="/img/features/pin.svg"
                 width={100}
                 height={10}
-                // width="100px"
                 className="m-auto"
               />
             </div>

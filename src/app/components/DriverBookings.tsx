@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
+import DataTable from "./ui/DataTable";
+import useAuth from "@/hooks/useAuth";
 
 interface BookingEntry {
   car: string;
@@ -11,38 +12,27 @@ interface BookingEntry {
 }
 interface BackendData {
   car?: string;
-  dateTime?: string; // Assuming it's a date-time string, update to Date if needed
+  dateTime?: string;
   status?: string;
-  name?: string;
+  passengerName?: string;
   mobile?: string;
   id: string;
+  startLocation?: string;
+  endLocation?: string;
 }
 
-const columns = [
-  { key: "car", label: "Car" },
-  { key: "journeyDate", label: "Journey Date" },
-  { key: "status", label: "Status" },
-  { key: "name", label: "Name" },
-  { key: "mobile", label: "Mobile Number" },
-];
-
 export default function DriverBookings() {
-  const cookies = new Cookies();
-  const uuid = cookies.get("uuid");
-  const role = cookies.get("role");
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [bookingData, setBookingData] = useState<BookingEntry[]>([]);
+  
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetching data", user?.userId, user?.role);
       try {
-        if (!uuid || !role) {
-          console.log("DriverBookings - Missing uuid or role:", { uuid, role });
-          return;
-        }
-
-        console.log("DriverBookings - Fetching bookings for:", { uuid, role });
+        if (!isAuthenticated || !user?.userId || !user?.role) return;
 
         const response = await fetch(
-          `/api/bookings?uuid=${uuid}&role=${role}`,
+          `/api/bookings`, // No query params needed - uses authentication middleware
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -51,36 +41,64 @@ export default function DriverBookings() {
         );
 
         const res = await response.json();
-        console.log("DriverBookings - Response:", res);
 
         if (!response.ok || !res.success) {
           throw new Error(res.error || "Failed to fetch bookings");
         }
 
         const bookings = res.data || [];
-        console.log("DriverBookings - Bookings received:", bookings.length);
 
         const filteredData = bookings.map((item: BackendData) => {
+          // Convert enum status to readable format
+          const statusMap: Record<string, string> = {
+            'PENDING': 'Pending',
+            'ACCEPTED': 'Accepted',
+            'REJECTED': 'Rejected',
+            'COMPLETED': 'Completed',
+            'CANCELLED': 'Cancelled'
+          };
+
           return {
             car: item?.car || "",
             journeyDate: item?.dateTime || "",
-            status: item?.status || "Pending",
-            name: item?.name || "",
+            status: statusMap[item?.status || 'PENDING'] || 'Pending',
+            name: item?.passengerName || "", // Use correct field name
             mobile: item?.mobile || "",
             id: item?.id,
           } as BookingEntry;
         });
 
-        console.log("DriverBookings - Filtered data:", filteredData);
         setBookingData(filteredData);
       } catch (err) {
-        console.error("DriverBookings - Error fetching bookings:", err);
+        console.error("Error fetching bookings:", err);
         setBookingData([]);
       }
     };
 
     fetchData();
-  }, [uuid, role]);
+  }, [user?.userId, user?.role, isAuthenticated]);
+
+  // Show loading state while authenticating
+  if (authLoading) {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="px-4 sm:px-6 mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
+        <div className="bg-white p-8 border rounded-lg text-center">
+          <p className="text-gray-600">Please log in to view your bookings.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6  mt-32 lg:pl-[100px] lg:pr-[80px] w-full bg-transparent">
@@ -97,111 +115,25 @@ export default function DriverBookings() {
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              {/* <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      Title
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      Email
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      Role
-                    </th>
-                    <th
-                      scope="col"
-                      className="relative py-3.5 pr-4 pl-3 sm:pr-3"
-                    >
-                      <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  {people.map((person) => (
-                    <tr key={person.email} className="even:bg-gray-50">
-                      <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-3">
-                        {person.name}
-                      </td>
-                      <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {person.title}
-                      </td>
-                      <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {person.email}
-                      </td>
-                      <td className="px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {person.role}
-                      </td>
-                      <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-3">
-                        <a
-                          href="#"
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          Edit<span className="sr-only">, {person.name}</span>
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table> */}
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    {columns.map((column) => (
-                      <th
-                        key={column.key}
-                        scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                      >
-                        {column.label}
-                      </th>
-                    ))}
-                    <th
-                      scope="col"
-                      className="relative py-3.5 pr-4 pl-3 sm:pr-3"
-                    >
-                      <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  {bookingData?.map((person) => (
-                    <tr key={person.id} className="even:bg-gray-50">
-                      {columns.map((column) => (
-                        <td
-                          key={column.key}
-                          className="px-3 py-4 text-sm whitespace-nowrap text-gray-500"
-                        >
-                          {person[column.key as keyof BookingEntry]}
-                        </td>
-                      ))}
-                      <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-3">
-                        <a
-                          href="#"
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          Edit<span className="sr-only">, {person.name}</span>
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <DataTable<BookingEntry>
+                data={bookingData}
+                columns={[
+                  { key: "car", label: "Car" },
+                  { key: "journeyDate", label: "Journey Date" },
+                  { key: "status", label: "Status" },
+                  { key: "name", label: "Name" },
+                  { key: "mobile", label: "Mobile Number" },
+                ]}
+                keyExtractor={(row) => row.id}
+                emptyMessage="No bookings found"
+                emptyDescription="Your bookings will appear here once you make a reservation."
+                actionColumn={(row) => (
+                  <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                    Edit<span className="sr-only">, {row.name}</span>
+                  </a>
+                )}
+                actionColumnLabel="Actions"
+              />
             </div>
           </div>
         </div>
