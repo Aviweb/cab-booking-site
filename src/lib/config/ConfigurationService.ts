@@ -37,7 +37,7 @@ class DatabaseConfigValidator implements ConfigValidator {
   validate(key: string, value: string | undefined): { isValid: boolean; error?: string } {
     if (key === "DATABASE_URL" && value) {
       if (!value.startsWith("mysql://") && !value.startsWith("postgresql://") && !value.startsWith("file:")) {
-        return { isValid: false, error: "DATABASE_URL must start with mysql:// or postgresql://" };
+        return { isValid: false, error: `DATABASE_URL must start with mysql:// or postgresql:// and not ${value}` };
       }
     }
     return { isValid: true };
